@@ -40,20 +40,20 @@ A Tabela~\ref{tab:metodo-performance} apresenta a média de tempos (em $ms$) de 
 \multicolumn{1}{|c|}{9} & 125.307 & 76.704 & 78.162 & 77.523 & 83.250 & 83.335 \\ \hline
 \multicolumn{1}{|c|}{10} & 120.886 & 77.993 & 80.702 & 79.195 & 85.414 & 119.491 \\ \hline
 \end{tabular}
-\caption{Tempos de processamento em $ms$ para o método IP2LB variando o tamanho do prefixo de consulta $q$ e variando também o $\lambda$ (coluna ``carac.''), a altura máxima para a \textit{trie}.}
+\caption{Tempos de processamento em $ms$ para o método IP2LB variando o tamanho do prefixo de consulta $q$ e variando também o $\lambda$ (coluna ``carac.''), a altura máxima para a \textit{Trie}.}
 \label{tab:metodo-performance}
 \end{table}
 
-Na Figura~\ref{fig:varying-usaddr-tau-3} estão representados os resultados da Tabela~\ref{tab:metodo-performance}. Há $7$ curvas (uma para cada valor de $\lambda$) de tempo de processamento em função do tamanho da consulta, para o método IP2LB variando o tamanho do prefixo de consulta $q$ e variando também o $\lambda$, a altura máxima para a \textit{trie}. 
+Na Figura~\ref{fig:varying-usaddr-tau-3} estão representados os resultados da Tabela~\ref{tab:metodo-performance}. Há $7$ curvas (uma para cada valor de $\lambda$) de tempo de processamento em função do tamanho da consulta, para o método IP2LB variando o tamanho do prefixo de consulta $q$ e variando também o $\lambda$, a altura máxima para a \textit{Trie}. 
 
 \begin{figure}[ht!]
     \centering
     \includegraphics[width=0.95\textwidth]{figures/varying_trie_prefix_method_IP2LB_dataset_usaddr_tau_3.png}
-    \caption{Curvas de tempo de processamento em $ms$ para o método IP2LB variando o tamanho do prefixo de consulta $q$ e variando também o $\lambda$, a altura máxima para a \textit{trie}.}
+    \caption{Curvas de tempo de processamento em $ms$ para o método IP2LB variando o tamanho do prefixo de consulta $q$ e variando também o $\lambda$, a altura máxima para a \textit{Trie}.}
     \label{fig:varying-usaddr-tau-3}
 \end{figure}
 
-É esperado que, quanto maior for o valor de $\lambda$, menor será o tempo de processamento. Essa tendência pode ser observado no gráfico da Figura~\ref{fig:varying-usaddr-tau-3}. No entanto, para $\lambda = 4$ a sua curva de tempos se distancia bastante das demais. Isso provavelmente ocorre porque, dada a natureza do algoritmo ICPAN, no término do primeiro nível há uma grande quantidade de nós ativos quando se indexa somente os $4$ primeiros caracteres na \textit{trie} (mesmo com sua otimização de poda de nós ativos redundantes).
+É esperado que, quanto maior for o valor de $\lambda$, menor será o tempo de processamento. Essa tendência pode ser observado no gráfico da Figura~\ref{fig:varying-usaddr-tau-3}. No entanto, para $\lambda = 4$ a sua curva de tempos se distancia bastante das demais. Isso provavelmente ocorre porque, dada a natureza do algoritmo ICPAN, no término do primeiro nível há uma grande quantidade de nós ativos quando se indexa somente os $4$ primeiros caracteres na \textit{Trie} (mesmo com sua otimização de poda de nós ativos redundantes).
 
 \subsection{Uso de memória do método IP2LB}
 
@@ -85,7 +85,7 @@ A Figura~\ref{fig:memory-usage-usaddr-tau-3} representa os dados da Tabela~\ref{
     \label{fig:memory-usage-usaddr-tau-3}
 \end{figure}
 
-É possível observar um padrão exponencial no consumo de memória à medida que a altura máxima permitida para a \textit{trie} aumenta. Isso acontece pois a função do número máximo de nós a cada nível de uma árvore $M-\text{á}ria$ como a \textit{trie} \citep{Knuth:1998} é de fato exponencial com base no tamanho do alfabeto $\Sigma$ considerado. Quanto menos prefixos em comum houver entre os itens indexados, mais o padrão de uso exponencial de memória será atingido.
+É possível observar um padrão exponencial no consumo de memória à medida que a altura máxima permitida para a \textit{Trie} aumenta. Isso acontece pois a função do número máximo de nós a cada nível de uma árvore $M-\text{á}ria$ como a \textit{Trie} \citep{Knuth:1998} é de fato exponencial com base no tamanho do alfabeto $\Sigma$ considerado. Quanto menos prefixos em comum houver entre os itens indexados, mais o padrão de uso exponencial de memória será atingido.
 
 \subsection{Tempo de processamento de todos os métodos}
 

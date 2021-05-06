@@ -8,25 +8,25 @@ Seja $D$ a base de dados considerada nos parágrafos a seguir, composta pelos se
  
 \subsection{Indexação} 
 \label{sec:indexing}
-Seja $w$ a cadeia de caracteres de um item, e $|w|$ o tamanho da cadeia, e $w[i]$ uma indicação do $i$-ésimo caractere de $w$, começando a partir de $1$. Assim, $w[i..j]$ representa uma subcadeia de caracteres de $w$ começando na $i$-ésima posição e terminando na $j$-ésima. Consideramos também que se $j > |w|$, então $w[i..j] = w$. Seja também $\lambda$ a altura máxima permitida para a \textit{trie} $\Upsilon$, considerando que o nível do nó $\epsilon$ (nó $N0$ na Figura~\ref{fig:index_structure}) é igual a $0$. Dessa forma, o nó $N7$ tem altura igual a $3$, por exemplo. 
+Seja $w$ a cadeia de caracteres de um item, e $|w|$ o tamanho da cadeia, e $w[i]$ uma indicação do $i$-ésimo caractere de $w$, começando a partir de $1$. Assim, $w[i..j]$ representa uma subcadeia de caracteres de $w$ começando na $i$-ésima posição e terminando na $j$-ésima. Consideramos também que se $j > |w|$, então $w[i..j] = w$. Seja também $\lambda$ a altura máxima permitida para a \textit{Trie} $\Upsilon$, considerando que o nível do nó $\epsilon$ (nó $N0$ na Figura~\ref{fig:index_structure}) é igual a $0$. Dessa forma, o nó $N7$ tem altura igual a $3$, por exemplo. 
 
 $\mathcal{T}$
  
  \begin{figure} [ht]
     \centering
     \includegraphics[width=0.94\textwidth]{figures/index-structure.png}
-    \caption{Árvore \textit{trie} com os prefixos de tamanho $\lambda$ indexados, com intervalos $R$ de \textit{ids} e listas $L$ de nós folha.}
+    \caption{Árvore \textit{Trie} com os prefixos de tamanho $\lambda$ indexados, com intervalos $R$ de \textit{ids} e listas $L$ de nós folha.}
     \label{fig:index_structure}
 \end{figure}
 
  
-Como parte da implementação da estrutura proposta, indexamos as descrições textuais dos itens em uma árvore \textit{trie} $\Upsilon$ mantida em memória. Para cada cadeia $w$ de um item, inserimos em $\Upsilon$ apenas o prefixo $w[1..\lambda]$ 
+Como parte da implementação da estrutura proposta, indexamos as descrições textuais dos itens em uma árvore \textit{Trie} $\Upsilon$ mantida em memória. Para cada cadeia $w$ de um item, inserimos em $\Upsilon$ apenas o prefixo $w[1..\lambda]$ 
 
 Cada nó $n$ em $\Upsilon$ contém um caractere $n.caractere$, um número de identificação $n.id$, a sua altura $n.altura$ correspondente na árvore (sendo a altura do nó $\epsilon$ igual a 0), e $n.ultimo$, que é o valor do $id$ do nó folha mais à esquerda de sua subárvore, em pré-ordem. Também possui um intervalo $n.R = [menor, maior]$ no qual $menor$ e $maior$ representam respectivamente o menor e o maior $id$ dos itens em $T$ que compartilham o mesmo prefixo $p_{n}$ obtido ao caminhar partindo do nó $\epsilon$ até $n$. Para uma subárvore com raiz no nó $n$, todos os itens nessa subárvore irão compartilhar o mesmo prefixo $p_{n}$. Objetivando a simplicidade, nós nos referimos a $n$ pelo seu prefixo $p_{n}$ correspondente de forma intercambiável. 
 
 Por fim, cada nó $n$ possui uma lista $n.L$ que contém todos os nós-folha de sua subárvore. Quando o próprio $n$ é uma folha, não possui subárvore, então a lista conterá apenas o próprio $n$, $n.L = [n.id]$.
 
-A Figura~\ref{fig:index_structure} mostra uma \textit{trie} $\Upsilon$ após a indexação dos $\lambda = 4$ primeiros caracteres de cada item em $D$. Também mantemos uma estrutura de dicionário $H$, representada pela ``Tabela de Itens'', que mapeia o valor do \textit{id} de um item ao texto do restante da sua descrição, ou seja, $w[5..|w|]$ (texto após o 4º caractere).
+A Figura~\ref{fig:index_structure} mostra uma \textit{Trie} $\Upsilon$ após a indexação dos $\lambda = 4$ primeiros caracteres de cada item em $D$. Também mantemos uma estrutura de dicionário $H$, representada pela ``Tabela de Itens'', que mapeia o valor do \textit{id} de um item ao texto do restante da sua descrição, ou seja, $w[5..|w|]$ (texto após o 4º caractere).
 
 Essa estrutura é utilizada para reconstruir a descrição completa de um item a partir de qualquer nó de prefixo \textit{p}. Apesar de a Figura~\ref{fig:index_structure} mostrar o texto completo de cada item, os $4$ primeiros caracteres ``apagados'' são na verdade obtidos ao caminhar por $\Upsilon$. Para possibilitar essa reconstrução, também guardamos em $H$ o $id$ do nó correspondente ao prefixo do item. Supondo por exemplo a reconstrução de ``\textit{investigate}'', com $id=7$ em $H$, basta processar o prefixo $p$ do nó $N8$, que é \textit{p = ``inve''}, como mostra a Figura~\ref{fig:index_structure}, e então concatenar $p$ com ``\textit{stigate}'', que é o conteúdo presente em $H$ para a chave $id=7$.
 
@@ -35,7 +35,7 @@ Essa estrutura é utilizada para reconstruir a descrição completa de um item a
 
 O algoritmo de busca utilizado no primeiro nível será o ICPAN, proposto por Li et al. Como descrito na seção~\ref{sec:related_work} algoritmo ICPAN utiliza um algoritmo incremental que calcula os prefixos semelhantes a um prefixo consultado, tolerando uma quantidade erros de digitação previamente definida como o limite de distancia de edição $\tau$.
 
-Uma característica desse algoritmo é a ``ativação'' de nós da \textit{trie} que correspondem a um prefixo que pode ser obtido considerando erros no prefixo consultado. Pode existir um erro, ou mais, dependendo do limite de distância de edição $\tau$ escolhido para a consulta. Para facilitar a compreensão do processo em dois níveis, faremos referências ao algoritmo~\ref{alg:2-level} nos parágrafos seguintes.
+Uma característica desse algoritmo é a ``ativação'' de nós da \textit{Trie} que correspondem a um prefixo que pode ser obtido considerando erros no prefixo consultado. Pode existir um erro, ou mais, dependendo do limite de distância de edição $\tau$ escolhido para a consulta. Para facilitar a compreensão do processo em dois níveis, faremos referências ao algoritmo~\ref{alg:2-level} nos parágrafos seguintes.
 
 Seja $p$ um prefixo consultado pelo usuário. Considerando que $p[1..\lambda]$ é uma sub-cadeia de caracteres de $p$ que vai do 1º até o $\lambda$-ésimo caractere, e que $p[1..\lambda] = p$ se $|p| \leq \lambda$, nós processamos a subcadeia $p[1..\lambda]$ na linha $3$ com o algoritmo ICPAN caractere a caractere, de acordo com os passos do algoritmo descritos na seção~\ref{sec:second_level}. Após terminar essa etapa obtemos um conjunto $\Psi_{p[1..\lambda]} = \{ \langle n, \xi_{n}^{p[1..\lambda]}, m_{i}, \xi_{n}^{p_{i}} \rangle \}$ de \textit{nós pivô ativos de} $p[1..\lambda]$. Se $|p| \leq \lambda$ consideramos que $p$ é uma consulta ``comum'', e então realizamos o processamento caractere a caractere padrão do ICPAN para obter a resposta na linha $5$. No entanto, quando $|p| > \lambda$, é necessário dividir o processamento em dois níveis.
 
