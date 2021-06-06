@@ -89,8 +89,17 @@
 % Citacoes por natbib
 
 \usepackage{natbib}
+
 \usepackage{algorithm}% http://ctan.org/pkg/algorithms
-\usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
+\makeatletter
+\renewcommand{\ALG@name}{Algoritmo}
+\makeatother
+
+\makeatletter
+\renewcommand{\listalgorithmname}{Lista de \ALG@name s}
+\makeatother
+
+\usepackage[noend]{algpseudocode}% http://ctan.org/pkg/algorithmicx
 \usepackage{lmodern}% http://ctan.org/pkg/lmodern
 \bibliographystyle{humannat}
 % \bibliographystyle{sbc-template}
@@ -105,6 +114,7 @@
 \renewcommand{\backrefpagesname}{Citado na(s) página(s):~}
 % Texto padrão antes do número das páginas
 \renewcommand{\backref}{}
+\newcommand{\mc}[1]{\mathcal{#1}}
 % Define os textos da citação
 \renewcommand*{\backrefalt}[4]{
 	\ifcase #1 %
@@ -204,7 +214,7 @@
 % (o * indica que haverá a ficha bibliográfica)
 % ---
 
-\imprimirfolhaderosto*
+\imprimirfolhaderosto* 
 
 % ---
 
@@ -467,6 +477,22 @@ A estrutura apresentada foi capaz de atingir o objetivo de realizar busca reduzi
 \listoftables*
 \cleardoublepage
 
+\makeatletter
+\renewcommand\numberline[1]{
+    \leftskip -0.7em
+    \rightskip 1.6em
+    \parfillskip -\rightskip
+    \parindent 0em
+    \@tempdima 2.0em
+    \vspace{0em} \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+    Algoritmo \normalfont #1 – }
+\makeatother
+\listofalgorithms
+\cleardoublepage
+
+\makeatletter
+\def\numberline#1{\hb@xt@\@tempdima{#1\hfil}}
+\makeatother
 
 % ---
 % inserir lista de abreviaturas e siglas
