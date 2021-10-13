@@ -1,152 +1,478 @@
 \section{Resultados}
 \label{sec:results}
 
-O método proposto na seção~\ref{sec:metodo} foi implementado na linguagem \textit{C++} para um melhor desempenho, e também possibilitar uma comparação mais justa com os \textit{baselines}, os quais também foram todos implementados em \textit{C++}. 
+Nesse capítulo nós apresentamos os resultados do estudo de parâmetros dos métodos propostos, suas vantagens e desvantagens e também os cenários onde podem ser melhor aplicados. Além disso, também comparamos os métodos propostos com alguns \textit{baselines} (métodos de linha de base). A partir dos experimentos espera-se responder as seguintes perguntas: i) É possível adaptar sistemas de busca em dois níveis para tirarem proveito da busca binária no segundo nível? ii) Quais são as adaptações necessárias e limitações de uso da ideia? iii) Há vantagens práticas na combinação de busca binária e busca sequencial no segundo nível?
 
 \subsection{Configuração dos experimentos}
 \label{sec:experiments-setup}
-Nos experimentos são comparados os seguintes algoritmos:
+
+\subsubsection{Métodos experimentados}
+Nos experimentos são analisados os seguintes algoritmos:
 \begin{itemize}
-    \item ICAN \citep{ji2009efficient}
-    \item ICPAN \citep{li2011efficient}
-    \item META \citep{deng2016meta}
-    \item IP2L -- Uma variação do método apresentado na seção~\ref{sec:metodo} que processa todos os nós pivô ativos com busca sequencial, sem utilizar a busca binária.
-    \item IP2LB -- Método apresentado na seção~\ref{sec:metodo} na íntegra.
+    \item \textbf{ICAN} -- Um método baseado na computação incremental de nós ativos. \citep{ji2009efficient}
+    \item \textbf{ICPAN} -- Uma otimização do método \textbf{ICAN} que se baseia na computação incremental de nós pivô ativos. \citep{li2011efficient}
+    \item \textbf{META} -- Um método que utiliza indexação em árvores compactas e que consegue reduzir computações redundantes no processamento de consultas. \citep{deng2016meta}
+    \item \textbf{BEVA} -- Um método baseado em manter um conjunto de ``nós ativos de fronteira'' e o ``autômato de vetores de edição'' para processar as consultas. \citep{zhou2016beva}
+    \item \textbf{IP2L} -- Método que segue a abordagem de processamento em dois níveis, utilizando o ICPAN no primeiro nível, e busca sequencial simples no segundo nível. (Seção~\ref{sec:IP2L})
+    \item \textbf{IP2LB} -- Variação do método IP2L, com utilização de busca binária e sequencial no segundo nível. (Seção~\ref{sec:IP2LB})
+    \item \textbf{IP2LRB} -- Variação do método IP2LB, com uma restrição na condição para ativar a busca binária no segundo nível. (Seção~\ref{sec:IP2LRB})
 \end{itemize}
 
-Os resultados de tempo processamento do META não serão considerados na exibição dos gráficos de linha, pois seus valores são muito maiores, o que dificulta a visualização dos gráficos. Além disso, todos os códigos-fonte dos \textit{baselines} são os originais utilizados pelos autores de seus respectivos artigos.
+\subsubsection{Ambiente de experimentação e Bases de Dados}
+
+Os métodos propostos na seção~\ref{sec:metodo} foram implementados na linguagem \textit{C++} visando obter um melhor desempenho, e também possibilitar uma comparação mais fidedigna com os \textit{baselines}, os quais também foram todos implementados em \textit{C++}. Todos os códigos-fonte dos \textit{baselines} são os originais utilizados pelos autores de seus respectivos artigos, com exceção do método BEVA, cuja implementação é própria e foi realizada no trabalho de \cite{berg2020}.
 
 Todos os experimentos foram realizados em uma máquina de servidor com processador \textit{Intel \textsuperscript{\textregistered} Xeon E5 4617 2.90 GHz}, com \textit{64GB} de memória \textit{RAM}, tendo o \textit{Ubuntu 18.04.1 LTS} como sistema operacional. Os algoritmos foram compilados com o \textit{gcc 7.4.0}. Os experimentos aqui apresentados servem para provar o conceito do método proposto neste trabalho, mas planejamos ainda realizar um novo conjunto de experimentos mais robustos e detalhados para concluir a pesquisa.
 
-Utilizamos uma base de dados pública denominada \textit{USADDR}, a qual é um conjunto com $10$ milhões de endereços e localizações dos Estados Unidos da América, extraídos da coleção \textit{SimpleGEO CC0}. Dessa base, os itens foram extraídos e inseridos em um único arquivo de texto no qual cada linha representa um item. Nela há um total de $10.251.121$ itens e $32.407.449$ palavras com tamanho médio igual a $6,249$ caracteres. Cada item possui uma média de $3,161$ palavras e tamanho médio médio igual a $19,757$ caracteres.
+Utilizamos as seguintes bases de dados:
 
-Todos os experimentos para medir o tempo de processamento foram realizados com uma média de $50$ consultas extraídas aleatoriamente da base de dados, com tamanhos variando de $3$ a $13$ (aumentando de $2$ em $2$), considerando $\tau=3$. Todas essas consultas tiveram seu terceiro caractere modificado por um novo diferente do atual, representando um erro de substituição. Para cada execução de cada algoritmo, também foi medido seu pico de memória utilizado.
-
-\subsection{Tempo de processamento do método IP2LB}
-
-A Tabela~\ref{tab:metodo-performance} apresenta a média de tempos (em $ms$) de processamento de consultas de prefixo $q$ utilizando o método IP2LB. A primeira coluna ``carac.'' representa os valores de $\lambda$ variando de $4$ até $10$, e as próximas colunas contêm as médias de tempo de processamento para cada tamanho $|q|$ de consulta. Para cada valor de $\lambda$ foram realizadas $50$ consultas como descrito na seção~\ref{sec:experiments-setup}, pois na prática cada valor de $\lambda$ para o método IP2LB (e IP2L) produz um modelo por si só, denominado IP2LB-$\lambda$.
+\begin{itemize}
+    \item \textbf{AOL}\footnote{\url{http://www.ccc.ipt.pt/~ricardo/experiments/AOL_DS.html}} -- Um histórico de \textit{logs} de consultas da plataforma \textit{AOL}, que possui cerca de $140$ mil consultas únicas e datadas entre março e maio de 2006. Para os experimentos foi gerado um arquivo de texto no qual cada linha representa um item. 
+    \item \textbf{USADDR}\footnote{\url{http://archive.org/download/2011-08-SimpleGeo-CC0-Public-Spaces/}} -- Um conjunto com $10$ milhões de endereços e localizações dos Estados Unidos da América, extraídos da coleção \textit{SimpleGEO CC0}. Dessa base, os itens foram extraídos e inseridos em um único arquivo de texto no qual cada linha representa um item.    
+\end{itemize} 
+ 
 
 \begin{table}[h]
 \centering
-\begin{tabular}{c|c|c|c|c|c|c|}
-\cline{2-7}
- & \multicolumn{6}{c|}{\textbf{Tamanho do Prefixo Consultado}} \\ \hline
-\multicolumn{1}{|c|}{\textbf{carac.}} & \textbf{|q| = 3} & \textbf{|q| = 5} & \textbf{|q| = 7} & \textbf{|q| = 9} & \textbf{|q| = 11} & \textbf{|q| = 13} \\ \hline
-\multicolumn{1}{|c|}{4} & 104.414 & 225.847 & 255.190 & 262.910 & 273.861 & 263.856 \\ \hline
-\multicolumn{1}{|c|}{5} & 116.767 & 58.892 & 117.848 & 117.092 & 124.004 & 129.742 \\ \hline
-\multicolumn{1}{|c|}{6} & 118.174 & 67.707 & 83.576 & 85.318 & 90.690 & 92.876 \\ \hline
-\multicolumn{1}{|c|}{7} & 123.378 & 71.812 & 71.817 & 79.232 & 82.692 & 85.913 \\ \hline
-\multicolumn{1}{|c|}{8} & 122.283 & 74.391 & 75.281 & 78.995 & 82.135 & 84.005 \\ \hline
-\multicolumn{1}{|c|}{9} & 125.307 & 76.704 & 78.162 & 77.523 & 83.250 & 83.335 \\ \hline
-\multicolumn{1}{|c|}{10} & 120.886 & 77.993 & 80.702 & 79.195 & 85.414 & 119.491 \\ \hline
-\end{tabular}
-\caption{Tempos de processamento em $ms$ para o método IP2LB variando o tamanho do prefixo de consulta $q$ e variando também o $\lambda$ (coluna ``carac.''), a altura máxima para a \textit{Trie}.}
-\label{tab:metodo-performance}
-\end{table}
-
-Na Figura~\ref{fig:varying-usaddr-tau-3} estão representados os resultados da Tabela~\ref{tab:metodo-performance}. Há $7$ curvas (uma para cada valor de $\lambda$) de tempo de processamento em função do tamanho da consulta, para o método IP2LB variando o tamanho do prefixo de consulta $q$ e variando também o $\lambda$, a altura máxima para a \textit{Trie}. 
-
-\begin{figure}[ht!]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/varying_trie_prefix_method_IP2LB_dataset_usaddr_tau_3.png}
-    \caption{Curvas de tempo de processamento em $ms$ para o método IP2LB variando o tamanho do prefixo de consulta $q$ e variando também o $\lambda$, a altura máxima para a \textit{Trie}.}
-    \label{fig:varying-usaddr-tau-3}
-\end{figure}
-
-É esperado que, quanto maior for o valor de $\lambda$, menor será o tempo de processamento. Essa tendência pode ser observado no gráfico da Figura~\ref{fig:varying-usaddr-tau-3}. No entanto, para $\lambda = 4$ a sua curva de tempos se distancia bastante das demais. Isso provavelmente ocorre porque, dada a natureza do algoritmo ICPAN, no término do primeiro nível há uma grande quantidade de nós ativos quando se indexa somente os $4$ primeiros caracteres na \textit{Trie} (mesmo com sua otimização de poda de nós ativos redundantes).
-
-\subsection{Uso de memória do método IP2LB}
-
-A Tabela~\ref{tab:memory-usage-usaddr-tau-3} exibe a quantidade memória utilizada pelo método IP2LB (segunda coluna) para cada valor de $\lambda$ (primeira coluna).
-
-\begin{table}[!ht]
-\centering
-\begin{tabular}{|c|c|}
+\begin{tabular}{|c|c|c|c|c|}
 \hline
-\textbf{carac.} & \textbf{Memória Utilizada (MB)} \\ \hline
-4 & 1378.490 \\ \hline
-5 & 1408.363 \\ \hline
-6 & 1528.575 \\ \hline
-7 & 1749.214 \\ \hline
-8 & 2075.432 \\ \hline
-9 & 2520.842 \\ \hline
-10 & 3078.759 \\ \hline
+\textbf{Base de Dados} & \textbf{Itens} & \textbf{Palavras} & \textbf{\begin{tabular}[c]{@{}c@{}}Tamanho médio \\ das palavras\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Tamanho médio \\ dos itens\end{tabular}} \\ \hline
+AOL & 143.591 & 690.685 & 6,2338 & 30,0728 \\ \hline
+USADDR & 7.699.149 & 25.432.812 & 5,7738 & 20,5595 \\ \hline
 \end{tabular}
-\caption{Quantidades de memória em \textit{MegaBytes} utilizada para cada valor de $\lambda$ no método IP2LB.}
-\label{tab:memory-usage-usaddr-tau-3}
+\caption{Estatísticas das bases de dados}
+\label{tab:dataset-statistics}
 \end{table}
 
-A Figura~\ref{fig:memory-usage-usaddr-tau-3} representa os dados da Tabela~\ref{tab:memory-usage-usaddr-tau-3}, contendo uma curva da quantidade de memória utilizada pelo método IP2LB em função do valor de $\lambda$.
+Todos os experimentos para medir o tempo de processamento nessas bases foram realizados com $500$ itens extraídos aleatoriamente da base de dados para servirem como prefixos de consulta, com tamanhos variando de $3$ a $13$ (aumentando de $2$ em $2$), e $\tau$ variando entre $1$, $2$ e $3$. Todos esses prefixos de consulta foram alterados com um número de erros de digitação que está dentro do intervalo $[0, \tau]$ em uma posição qualquer da cadeia de caracteres. O número de erros e a posição dos erros é escolhida aleatoriamente. Para cada execução de cada algoritmo, também foi medido seu pico de memória utilizado.
 
-\begin{figure}[!ht]
-    \centering
-    \includegraphics[width=0.95\textwidth]{figures/memory_usage_IP2LB_dataset_usaddr_tau_3.png}
-    \caption{Curva de quantidades de memória em \textit{MegaBytes} utilizada para cada valor de $\lambda$ no método IP2LB.}
-    \label{fig:memory-usage-usaddr-tau-3}
-\end{figure}
+Ademais, também utilizamos uma base de dados extraída de um sistema real de complementação automática de consultas, da empresa Jusbrasil\footnote{\url{http://www.jusbrasil.com.br}}, um empreendimento que une Direito e Tecnologia e fornece um serviço de busca vertical para seus usuários. Essa base de dados contém 23.375.740 itens. Além disso, há também um \textit{log} com 648.264 prefixos de consulta submetidos para esse sistema, do qual extraímos $1000$ prefixos. Ele contém os prefixos máximos digitados pelos usuários antes de clicarem no botão que performa a busca, ou antes de clicarem em uma opção sugerida pelo sistema. Essa base de dados será referida como JUSBRASIL, a qual está detalhada na Tabela~\ref{tab:jusbrasil-dataset}. Nos experimentos realizados com essa base utilizamos os textos dos prefixos de consulta na íntegra, sem variar o tamanho, e os valores de $\tau$ experimentados foram variados entre $1$, $2$ e $3$.
 
-É possível observar um padrão exponencial no consumo de memória à medida que a altura máxima permitida para a \textit{Trie} aumenta. Isso acontece pois a função do número máximo de nós a cada nível de uma árvore $M-\text{á}ria$ como a \textit{Trie} \citep{Knuth:1998} é de fato exponencial com base no tamanho do alfabeto $\Sigma$ considerado. Quanto menos prefixos em comum houver entre os itens indexados, mais o padrão de uso exponencial de memória será atingido.
-
-\subsection{Tempo de processamento de todos os métodos}
-
-A Tabela~\ref{tab:performance-usaddr-tau-3} apresenta as médias de tempo de processamento (em $ms$) para cada método, considerando $\lambda=6$ para IP2LB e o IP2L. Tal valor de $\lambda$ foi escolhido com a intenção de melhor otimizar a relação desempenho/consumo de memória para ambos os métodos. 
-
-\begin{table}[ht]
+\begin{table}[h]
 \centering
-\begin{tabular}{c|c|c|c|c|c|c|}
-\cline{2-7}
- & \multicolumn{6}{c|}{\textbf{Tamanho da Consulta}} \\ \hline
-\multicolumn{1}{|c|}{\textbf{alg.}} & \textbf{|q| = 3} & \textbf{|q| = 5} & \textbf{|q| = 7} & \textbf{|q| = 9} & \textbf{|q| = 11} & \textbf{|q| = 13} \\ \hline
-\multicolumn{1}{|c|}{IP2LB-6} & 118.174 & 67.707 & 83.576 & 85.318 & 90.690 & 92.876 \\ \hline
-\multicolumn{1}{|c|}{IP2L-6} & 119.540 & 67.749 & 125.885 & 148.891 & 155.325 & 158.376 \\ \hline
-\multicolumn{1}{|c|}{ICPAN} & 152.106 & 118.598 & 123.010 & 125.072 & 130.454 & 134.613 \\ \hline
-\multicolumn{1}{|c|}{ICAN} & 198.942 & 176.930 & 200.260 & 201.083 & 209.302 & 200.332 \\ \hline
-\multicolumn{1}{|c|}{META} & 3180.390 & 5458.480 & 5583.350 & 5794.830 & 6021.520 & 6006.690 \\ \hline
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{Arquivo} & \textbf{Itens} & \textbf{Palavras} & \textbf{\begin{tabular}[c]{@{}c@{}}Tamanho médio \\ das palavras\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}Tamanho médio \\ dos itens\end{tabular}} \\ \hline
+sugestões de consulta & 23.374.740 & 91.340.225 & 6,0582 & 26,0839 \\ \hline
+prefixos de consulta & 1.000 & 2.845 & 6,1364 & 18,6230 \\ \hline
 \end{tabular}
-\caption{Tempos de processamento em $ms$ dos métodos, considerando $\lambda = 6$ para os métodos IP2LB e IP2L.}
-\label{tab:performance-usaddr-tau-3}
+\caption{Estatísticas das sugestões de consulta e dos prefixos de consultas provindos da base de dados da JUSBRASIL.}
+\label{tab:jusbrasil-dataset}
 \end{table}
 
-A Figura~\ref{tab:performance-usaddr-tau-3} contém uma curva de tempo de processamento em função do tamanho do prefixo de consulta as médias de tempo de processamento (em $ms$) para cada método, considerando $\lambda=6$ para IP2LB e o IP2L.
+\subsection{Avaliando os parâmetros dos métodos propostos}
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.9\textwidth]{figures/performance_baselines_dataset_usaddr_tau_3.png}
-    \caption{Curvas de tempo de processamento em $ms$ dos métodos, considerando $\lambda = 6$ para os métodos IP2LB e IP2L.}
-    \label{fig:performance-usaddr-tau-3}
-\end{figure}
+Nessa seção iremos realizar a seleção do parâmetro $\lambda$ para os métodos IP2L, IP2LB e IP2LRB propostos na Seção~\ref{sec:metodo}, com valores variando de $5$ a $10$. Não analisamos valores abaixo de $5$ pois o processamento da consulta ficaria custoso demais devido à frequente ativação do segundo nível. Semelhantemente, também não analisamos valores acima de $10$ pois grande parte do processamento da consulta ocorreria no primeiro nível. O objetivo dessa seção é estudar os efeitos de diferentes valores de $\lambda$ nos três métodos e escolher o melhor valor para os métodos considerando o tempo de processamento das consultas, o consumo de memória e também a acurácia. 
 
-O método com melhor desempenho foi o IP2LB-6. Também é possível observar que o método IP2L, sem a busca binária no segundo nível, atinge tempos de processamento maiores que o ICPAN para consultas de tamanho maior que $7$, enquanto no mesmo cenário o método IP2LB-6 mantém-se aproximadamente $40\%$ mais rápido que o ICPAN. Além disso, o formato das curvas dos métodos ICPAN e IP2LB apresentam um formato similar. Isso demonstra que a busca binária nos nós ativos de borda do segundo nível consegue ``estabilizá-lo'' de forma que o desempenho da estrutura completa mantém-se, no mínimo, semelhante ao do algoritmo utilizado no primeiro nível.
+\subsubsection{Tempo de processamento de prefixos de consulta}
 
-\subsection{Uso de memória de todos os métodos}
+O tempo de processamento das consultas é uma métrica muito importante para avaliar sistemas de CATE. Essa métrica permite distinguir os algoritmos lentos dos rápidos para então escolher quais irão proporcionar a melhor experiência para o usuário, evitando atrasos notáveis e exibindo respostas a cada caractere digitado. Nós medimos o tempo de processamento em cada um dos dois níveis, portanto, o valor da coluna ``total'' nas Tabelas dos experimentos é igual a soma dos valores das colunas ``1º'' e ``2º'' e representa o valor total do tempo de processamento. As Tabelas \ref{tab:methods-processing-time-tau-1-AOL} e  \ref{tab:methods-processing-time-tau-1-USADDR} contêm, considerando uma tolerância de $\tau=1$ erros de digitação, as medições dos tempos de processamento para os variados tamanho de prefixos de consulta. Semelhantemente, as Tabelas \ref{tab:methods-processing-time-tau-2-AOL} e \ref{tab:methods-processing-time-tau-2-USADDR} para $\tau=2$ e as Tabelas \ref{tab:methods-processing-time-tau-3-AOL} e \ref{tab:methods-processing-time-tau-3-USADDR} para $\tau=3$.
 
-A Tabela~\ref{tab:memory-usage-usaddr-tau-3} apresenta a média do consumo de memória (em \textit{MegaBytes}) para cada método, considerando $\lambda=6$ para IP2LB e o IP2L.
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-19}
+ & \multicolumn{18}{c|}{\textbf{$\tau=1$}} \\ \hline
+\multicolumn{1}{|c|}{} & \multicolumn{3}{c|}{\textbf{$|p|=3$}} & \multicolumn{3}{c|}{\textbf{$|p|=5$}} & \multicolumn{3}{c|}{\textbf{$|p|=7$}} & \multicolumn{3}{c|}{\textbf{$|p|=9$}} & \multicolumn{3}{c|}{\textbf{$|p|=11$}} & \multicolumn{3}{c|}{\textbf{$|p|=13$}} \\ \cline{2-19} 
+\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{método}}} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} \\ \hline
+\multicolumn{1}{|c|}{IP2L-5} & {\color[HTML]{656565} 0,32} & {\color[HTML]{656565} } & 0,32 & {\color[HTML]{656565} 0,13} & {\color[HTML]{656565} 0,22} & 0,35 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 2,2} & 2,24 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 2,74} & 2,79 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 3,76} & 3,81 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 4,21} & 4,26 \\ \hline
+\multicolumn{1}{|c|}{IP2L-6} & {\color[HTML]{656565} 0,33} & {\color[HTML]{656565} } & 0,33 & {\color[HTML]{656565} 0,14} & {\color[HTML]{656565} } & 0,14 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,41} & 0,46 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,58} & 0,63 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,83} & 0,89 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,8} & 0,85 \\ \hline
+\multicolumn{1}{|c|}{IP2L-7} & {\color[HTML]{656565} 0,33} & {\color[HTML]{656565} } & 0,33 & {\color[HTML]{656565} 0,14} & {\color[HTML]{656565} } & 0,14 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,06} & 0,11 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,13} & 0,19 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,21} & 0,27 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,21} & 0,27 \\ \hline
+\multicolumn{1}{|c|}{IP2L-8} & {\color[HTML]{656565} 0,33} & {\color[HTML]{656565} } & 0,33 & {\color[HTML]{656565} 0,15} & {\color[HTML]{656565} } & 0,15 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} } & 0,06 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,05} & 0,11 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,1} & 0,16 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,1} & 0,16 \\ \hline
+\multicolumn{1}{|c|}{IP2L-9} & {\color[HTML]{656565} 0,33} & {\color[HTML]{656565} } & 0,33 & {\color[HTML]{656565} 0,15} & {\color[HTML]{656565} } & 0,15 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} } & 0,06 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,02} & 0,08 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,06} & 0,12 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,06} & 0,12 \\ \hline
+\multicolumn{1}{|c|}{IP2L-10} & {\color[HTML]{656565} 0,33} & {\color[HTML]{656565} } & 0,33 & {\color[HTML]{656565} 0,15} & {\color[HTML]{656565} } & 0,15 & {\color[HTML]{656565} 0,07} & {\color[HTML]{656565} } & 0,07 & {\color[HTML]{656565} 0,10} & {\color[HTML]{656565} } & 0,10 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,03} & 0,09 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,03} & 0,10 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-5} & {\color[HTML]{656565} 0,32} & {\color[HTML]{656565} } & 0,32 & {\color[HTML]{656565} 0,13} & {\color[HTML]{656565} 0,04} & 0,17 & {\color[HTML]{656565} 0,04} & {\color[HTML]{656565} 0,24} & 0,28 & {\color[HTML]{656565} 0,04} & {\color[HTML]{656565} 0,35} & 0,39 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,51} & 0,56 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,45} & 0,50 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-6} & {\color[HTML]{656565} 0,33} & {\color[HTML]{656565} } & 0,33 & {\color[HTML]{656565} 0,14} & {\color[HTML]{656565} } & 0,14 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,03} & 0,08 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,04} & 0,09 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,06} & 0,11 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,06} & 0,11 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-7} & {\color[HTML]{656565} 0,34} & {\color[HTML]{656565} } & 0,34 & {\color[HTML]{656565} 0,15} & {\color[HTML]{656565} } & 0,15 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,04} & 0,09 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,03} & 0,08 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,04} & 0,10 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,04} & 0,09 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-8} & {\color[HTML]{656565} 0,33} & {\color[HTML]{656565} } & 0,33 & {\color[HTML]{656565} 0,15} & {\color[HTML]{656565} } & 0,15 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} } & 0,06 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,02} & 0,08 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,03} & 0,08 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,03} & 0,08 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-9} & {\color[HTML]{656565} 0,33} & {\color[HTML]{656565} } & 0,33 & {\color[HTML]{656565} 0,15} & {\color[HTML]{656565} } & 0,15 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} } & 0,06 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,01} & 0,07 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,02} & 0,08 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,02} & 0,08 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10} & {\color[HTML]{656565} 0,34} & {\color[HTML]{656565} } & 0,34 & {\color[HTML]{656565} 0,15} & {\color[HTML]{656565} } & 0,15 & {\color[HTML]{656565} 0,07} & {\color[HTML]{656565} } & 0,07 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} } & 0,06 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,01} & 0,07 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,01} & 0,07 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-5} & {\color[HTML]{656565} 0,33} & {\color[HTML]{656565} } & 0,33 & {\color[HTML]{656565} 0,14} & {\color[HTML]{656565} 0,23} & 0,36 & {\color[HTML]{656565} 0,08} & {\color[HTML]{656565} 0,85} & 0,94 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 1,1} & 1,15 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 1,52} & 1,58 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 1,78} & 1,84 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-6} & {\color[HTML]{656565} 0,34} & {\color[HTML]{656565} } & 0,34 & {\color[HTML]{656565} 0,15} & {\color[HTML]{656565} } & 0,15 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,17} & 0,22 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,2} & 0,26 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,24} & 0,29 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,26} & 0,31 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-7} & {\color[HTML]{656565} 0,33} & {\color[HTML]{656565} } & 0,33 & {\color[HTML]{656565} 0,15} & {\color[HTML]{656565} } & 0,15 & {\color[HTML]{656565} 0,05} & {\color[HTML]{656565} 0,07} & 0,12 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,08} & 0,14 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,12} & 0,18 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,11} & 0,17 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-8} & {\color[HTML]{656565} 0,34} & {\color[HTML]{656565} } & 0,34 & {\color[HTML]{656565} 0,15} & {\color[HTML]{656565} } & 0,15 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} } & 0,06 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,04} & 0,10 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,07} & 0,13 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,07} & 0,13 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-9} & {\color[HTML]{656565} 0,35} & {\color[HTML]{656565} } & 0,35 & {\color[HTML]{656565} 0,15} & {\color[HTML]{656565} } & 0,15 & {\color[HTML]{656565} 0,08} & {\color[HTML]{656565} } & 0,08 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,02} & 0,08 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} 0,04} & 0,10 & {\color[HTML]{656565} 0,08} & {\color[HTML]{656565} 0,04} & 0,12 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & {\color[HTML]{656565} 0,34} & {\color[HTML]{656565} } & 0,34 & {\color[HTML]{656565} 0,16} & {\color[HTML]{656565} } & 0,16 & {\color[HTML]{656565} 0,07} & {\color[HTML]{656565} } & 0,07 & {\color[HTML]{656565} 0,06} & {\color[HTML]{656565} } & 0,06 & {\color[HTML]{656565} 0,07} & {\color[HTML]{656565} 0,02} & 0,09 & {\color[HTML]{656565} 0,08} & {\color[HTML]{656565} 0,02} & 0,10 \\ \hline
+\end{tabular}%
+}
+\caption{Tempo de processamento (ms) dos métodos IP2L, IP2LB e IP2LRB para prefixos de consulta com tamanho $3,5,6,9,11$ e $13$, valores de $\lambda$ variando de $5$ a $10$, e para $\tau=1$ na base de dados AOL.}
+\label{tab:methods-processing-time-tau-1-AOL}
+\end{table}
 
-A Figura~\ref{fig:memory-usage-usaddr-tau-3} representa os resultados da Tabela~\ref{tab:memory-usage-usaddr-tau-3} em forma de gráficos de barras, havendo uma barra para método, com média de seu consumo de memória (em \textit{MegaBytes}).
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-19}
+ & \multicolumn{18}{c|}{$\tau=1$} \\ \hline
+\multicolumn{1}{|c|}{} & \multicolumn{3}{c|}{\textbf{$|p|=3$}} & \multicolumn{3}{c|}{\textbf{$|p|=5$}} & \multicolumn{3}{c|}{\textbf{$|p|=7$}} & \multicolumn{3}{c|}{\textbf{$|p|=9$}} & \multicolumn{3}{c|}{\textbf{$|p|=11$}} & \multicolumn{3}{c|}{\textbf{$|p|=13$}} \\ \cline{2-19} 
+\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{método}}} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} \\ \hline
+\multicolumn{1}{|c|}{IP2L-5} & {\color[HTML]{656565} 6,99} & {\color[HTML]{656565} } & 6,99 & {\color[HTML]{656565} 0,30} & {\color[HTML]{656565} 2,43} & 2,73 & {\color[HTML]{656565} 0,19} & {\color[HTML]{656565} 5,41} & 5,60 & {\color[HTML]{656565} 0,21} & {\color[HTML]{656565} 8,44} & 8,64 & {\color[HTML]{656565} 0,20} & {\color[HTML]{656565} 9,85} & 10,06 & {\color[HTML]{656565} 0,21} & {\color[HTML]{656565} 12,44} & 12,66 \\ \hline
+\multicolumn{1}{|c|}{IP2L-6} & {\color[HTML]{656565} 6,96} & {\color[HTML]{656565} } & 6,96 & {\color[HTML]{656565} 0,66} & {\color[HTML]{656565} } & 0,66 & {\color[HTML]{656565} 0,20} & {\color[HTML]{656565} 2,4} & 2,60 & {\color[HTML]{656565} 0,21} & {\color[HTML]{656565} 4,42} & 4,63 & {\color[HTML]{656565} 0,21} & {\color[HTML]{656565} 4,66} & 4,87 & {\color[HTML]{656565} 0,22} & {\color[HTML]{656565} 6,25} & 6,47 \\ \hline
+\multicolumn{1}{|c|}{IP2L-7} & {\color[HTML]{656565} 6,98} & {\color[HTML]{656565} } & 6,98 & {\color[HTML]{656565} 0,68} & {\color[HTML]{656565} } & 0,68 & {\color[HTML]{656565} 0,23} & {\color[HTML]{656565} 0,47} & 0,69 & {\color[HTML]{656565} 0,21} & {\color[HTML]{656565} 1,7} & 1,91 & {\color[HTML]{656565} 0,21} & {\color[HTML]{656565} 2,22} & 2,43 & {\color[HTML]{656565} 0,22} & {\color[HTML]{656565} 2,98} & 3,20 \\ \hline
+\multicolumn{1}{|c|}{IP2L-8} & {\color[HTML]{656565} 6,96} & {\color[HTML]{656565} } & 6,96 & {\color[HTML]{656565} 0,69} & {\color[HTML]{656565} } & 0,69 & {\color[HTML]{656565} 0,31} & {\color[HTML]{656565} } & 0,31 & {\color[HTML]{656565} 0,22} & {\color[HTML]{656565} 0,82} & 1,04 & {\color[HTML]{656565} 0,23} & {\color[HTML]{656565} 1,3} & 1,53 & {\color[HTML]{656565} 0,23} & {\color[HTML]{656565} 1,74} & 1,97 \\ \hline
+\multicolumn{1}{|c|}{IP2L-9} & {\color[HTML]{656565} 6,98} & {\color[HTML]{656565} } & 6,98 & {\color[HTML]{656565} 0,70} & {\color[HTML]{656565} } & 0,70 & {\color[HTML]{656565} 0,32} & {\color[HTML]{656565} } & 0,32 & {\color[HTML]{656565} 0,23} & {\color[HTML]{656565} 0,19} & 0,43 & {\color[HTML]{656565} 0,34} & {\color[HTML]{656565} 0,68} & 1,03 & {\color[HTML]{656565} 0,24} & {\color[HTML]{656565} 0,93} & 1,17 \\ \hline
+\multicolumn{1}{|c|}{IP2L-10} & {\color[HTML]{656565} 7,00} & {\color[HTML]{656565} } & 7,00 & {\color[HTML]{656565} 0,70} & {\color[HTML]{656565} } & 0,70 & {\color[HTML]{656565} 0,31} & {\color[HTML]{656565} } & 0,31 & {\color[HTML]{656565} 0,27} & {\color[HTML]{656565} } & 0,27 & {\color[HTML]{656565} 0,24} & {\color[HTML]{656565} 0,23} & 0,47 & {\color[HTML]{656565} 0,24} & {\color[HTML]{656565} 0,4} & 0,64 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-5} & {\color[HTML]{656565} 6,96} & {\color[HTML]{656565} } & 6,96 & {\color[HTML]{656565} 0,30} & {\color[HTML]{656565} 1,16} & 1,45 & {\color[HTML]{656565} 0,17} & {\color[HTML]{656565} 0,93} & 1,10 & {\color[HTML]{656565} 0,18} & {\color[HTML]{656565} 1,3} & 1,47 & {\color[HTML]{656565} 0,18} & {\color[HTML]{656565} 1,59} & 1,77 & {\color[HTML]{656565} 0,20} & {\color[HTML]{656565} 2,14} & 2,34 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-6} & {\color[HTML]{656565} 7,02} & {\color[HTML]{656565} } & 7,02 & {\color[HTML]{656565} 0,67} & {\color[HTML]{656565} } & 0,67 & {\color[HTML]{656565} 0,19} & {\color[HTML]{656565} 0,31} & 0,50 & {\color[HTML]{656565} 0,20} & {\color[HTML]{656565} 0,71} & 0,91 & {\color[HTML]{656565} 0,19} & {\color[HTML]{656565} 0,8} & 0,99 & {\color[HTML]{656565} 0,21} & {\color[HTML]{656565} 1,12} & 1,32 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-7} & {\color[HTML]{656565} 6,96} & {\color[HTML]{656565} } & 6,96 & {\color[HTML]{656565} 0,68} & {\color[HTML]{656565} } & 0,68 & {\color[HTML]{656565} 0,23} & {\color[HTML]{656565} 0,31} & 0,54 & {\color[HTML]{656565} 0,20} & {\color[HTML]{656565} 0,32} & 0,52 & {\color[HTML]{656565} 0,20} & {\color[HTML]{656565} 0,44} & 0,64 & {\color[HTML]{656565} 0,23} & {\color[HTML]{656565} 0,58} & 0,80 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-8} & {\color[HTML]{656565} 7,00} & {\color[HTML]{656565} } & 7,00 & {\color[HTML]{656565} 0,69} & {\color[HTML]{656565} } & 0,69 & {\color[HTML]{656565} 0,32} & {\color[HTML]{656565} } & 0,32 & {\color[HTML]{656565} 0,21} & {\color[HTML]{656565} 0,12} & 0,34 & {\color[HTML]{656565} 0,21} & {\color[HTML]{656565} 0,23} & 0,44 & {\color[HTML]{656565} 0,23} & {\color[HTML]{656565} 0,33} & 0,56 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-9} & {\color[HTML]{656565} 7,00} & {\color[HTML]{656565} } & 7,00 & {\color[HTML]{656565} 0,70} & {\color[HTML]{656565} } & 0,70 & {\color[HTML]{656565} 0,31} & {\color[HTML]{656565} } & 0,31 & {\color[HTML]{656565} 0,24} & {\color[HTML]{656565} 0,12} & 0,36 & {\color[HTML]{656565} 0,23} & {\color[HTML]{656565} 0,1} & 0,33 & {\color[HTML]{656565} 0,25} & {\color[HTML]{656565} 0,15} & 0,40 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10} & {\color[HTML]{656565} 6,98} & {\color[HTML]{656565} } & 6,98 & {\color[HTML]{656565} 0,70} & {\color[HTML]{656565} } & 0,70 & {\color[HTML]{656565} 0,32} & {\color[HTML]{656565} } & 0,32 & {\color[HTML]{656565} 0,27} & {\color[HTML]{656565} } & 0,27 & {\color[HTML]{656565} 0,23} & {\color[HTML]{656565} 0,03} & 0,26 & {\color[HTML]{656565} 0,25} & {\color[HTML]{656565} 0,05} & 0,31 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-5} & {\color[HTML]{656565} 7,00} & {\color[HTML]{656565} } & 7,00 & {\color[HTML]{656565} 0,36} & {\color[HTML]{656565} 2,93} & 3,29 & {\color[HTML]{656565} 0,18} & {\color[HTML]{656565} 2,52} & 2,70 & {\color[HTML]{656565} 0,25} & {\color[HTML]{656565} 3,76} & 4,01 & {\color[HTML]{656565} 0,21} & {\color[HTML]{656565} 4,55} & 4,75 & {\color[HTML]{656565} 0,22} & {\color[HTML]{656565} 5,59} & 5,81 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-6} & {\color[HTML]{656565} 7,07} & {\color[HTML]{656565} } & 7,07 & {\color[HTML]{656565} 0,68} & {\color[HTML]{656565} } & 0,68 & {\color[HTML]{656565} 0,20} & {\color[HTML]{656565} 1,03} & 1,23 & {\color[HTML]{656565} 0,21} & {\color[HTML]{656565} 1,88} & 2,09 & {\color[HTML]{656565} 0,22} & {\color[HTML]{656565} 1,77} & 1,99 & {\color[HTML]{656565} 0,20} & {\color[HTML]{656565} 2,35} & 2,55 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-7} & {\color[HTML]{656565} 7,01} & {\color[HTML]{656565} } & 7,01 & {\color[HTML]{656565} 0,68} & {\color[HTML]{656565} } & 0,68 & {\color[HTML]{656565} 0,22} & {\color[HTML]{656565} 0,61} & 0,84 & {\color[HTML]{656565} 0,26} & {\color[HTML]{656565} 0,84} & 1,10 & {\color[HTML]{656565} 0,23} & {\color[HTML]{656565} 0,92} & 1,15 & {\color[HTML]{656565} 0,21} & {\color[HTML]{656565} 1,23} & 1,45 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-8} & {\color[HTML]{656565} 7,06} & {\color[HTML]{656565} } & 7,06 & {\color[HTML]{656565} 0,72} & {\color[HTML]{656565} } & 0,72 & {\color[HTML]{656565} 0,31} & {\color[HTML]{656565} } & 0,31 & {\color[HTML]{656565} 0,29} & {\color[HTML]{656565} 0,53} & 0,81 & {\color[HTML]{656565} 0,27} & {\color[HTML]{656565} 0,69} & 0,96 & {\color[HTML]{656565} 0,22} & {\color[HTML]{656565} 0,78} & 1,00 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-9} & {\color[HTML]{656565} 7,00} & {\color[HTML]{656565} } & 7,00 & {\color[HTML]{656565} 0,73} & {\color[HTML]{656565} } & 0,73 & {\color[HTML]{656565} 0,34} & {\color[HTML]{656565} } & 0,34 & {\color[HTML]{656565} 0,26} & {\color[HTML]{656565} 0,25} & 0,51 & {\color[HTML]{656565} 0,24} & {\color[HTML]{656565} 0,39} & 0,63 & {\color[HTML]{656565} 0,23} & {\color[HTML]{656565} 0,42} & 0,65 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & {\color[HTML]{656565} 7,04} & {\color[HTML]{656565} } & 7,04 & {\color[HTML]{656565} 0,72} & {\color[HTML]{656565} } & 0,72 & {\color[HTML]{656565} 0,35} & {\color[HTML]{656565} } & 0,35 & {\color[HTML]{656565} 0,26} & {\color[HTML]{656565} } & 0,26 & {\color[HTML]{656565} 0,24} & {\color[HTML]{656565} 0,13} & 0,38 & {\color[HTML]{656565} 0,23} & {\color[HTML]{656565} 0,18} & 0,41 \\ \hline
+\end{tabular}%
+}
+\caption{Tempo de processamento (ms) dos métodos IP2L, IP2LB e IP2LRB para prefixos de consulta com tamanho $3,5,6,9,11$ e $13$, valores de $\lambda$ variando de $5$ a $10$, e para $\tau=1$ na base de dados USADDR.}
+\label{tab:methods-processing-time-tau-1-USADDR}
+\end{table}
 
-O uso da estrutura de busca em dois níveis resultou em uma redução de $80\%$ do uso de memória aproximadamente, considerando o IP2LB e o ICPAN, por exemplo.
+
+
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-19}
+ & \multicolumn{18}{c|}{$\tau=2$} \\ \hline
+\multicolumn{1}{|c|}{} & \multicolumn{3}{c|}{\textbf{$|p|=3$}} & \multicolumn{3}{c|}{\textbf{$|p|=5$}} & \multicolumn{3}{c|}{\textbf{$|p|=7$}} & \multicolumn{3}{c|}{\textbf{$|p|=9$}} & \multicolumn{3}{c|}{\textbf{$|p|=11$}} & \multicolumn{3}{c|}{\textbf{$|p|=13$}} \\ \cline{2-19} 
+\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{método}}} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} \\ \hline
+\multicolumn{1}{|c|}{IP2L-5} & {\color[HTML]{656565} 1,89} & {\color[HTML]{656565} } & 1,89 & {\color[HTML]{656565} 0,49} & {\color[HTML]{656565} 6,4} & 6,89 & {\color[HTML]{656565} 0,53} & {\color[HTML]{656565} 12,78} & 13,32 & {\color[HTML]{656565} 0,54} & {\color[HTML]{656565} 15,96} & 16,50 & {\color[HTML]{656565} 0,56} & {\color[HTML]{656565} 19,89} & 20,44 & {\color[HTML]{656565} 0,56} & {\color[HTML]{656565} 22,8} & 23,37 \\ \hline
+\multicolumn{1}{|c|}{IP2L-6} & {\color[HTML]{656565} 1,92} & {\color[HTML]{656565} } & 1,92 & {\color[HTML]{656565} 0,70} & {\color[HTML]{656565} 1,54} & 2,24 & {\color[HTML]{656565} 0,52} & {\color[HTML]{656565} 5,68} & 6,21 & {\color[HTML]{656565} 0,53} & {\color[HTML]{656565} 7,81} & 8,34 & {\color[HTML]{656565} 0,57} & {\color[HTML]{656565} 9,95} & 10,52 & {\color[HTML]{656565} 0,56} & {\color[HTML]{656565} 11,15} & 11,70 \\ \hline
+\multicolumn{1}{|c|}{IP2L-7} & {\color[HTML]{656565} 1,94} & {\color[HTML]{656565} } & 1,94 & {\color[HTML]{656565} 0,79} & {\color[HTML]{656565} } & 0,79 & {\color[HTML]{656565} 0,55} & {\color[HTML]{656565} 2,35} & 2,90 & {\color[HTML]{656565} 0,56} & {\color[HTML]{656565} 3,62} & 4,18 & {\color[HTML]{656565} 0,59} & {\color[HTML]{656565} 4,95} & 5,54 & {\color[HTML]{656565} 0,58} & {\color[HTML]{656565} 5,33} & 5,91 \\ \hline
+\multicolumn{1}{|c|}{IP2L-8} & {\color[HTML]{656565} 1,94} & {\color[HTML]{656565} } & 1,94 & {\color[HTML]{656565} 0,77} & {\color[HTML]{656565} } & 0,77 & {\color[HTML]{656565} 0,56} & {\color[HTML]{656565} 0,41} & 0,97 & {\color[HTML]{656565} 0,56} & {\color[HTML]{656565} 0,76} & 1,33 & {\color[HTML]{656565} 0,61} & {\color[HTML]{656565} 1,13} & 1,74 & {\color[HTML]{656565} 0,60} & {\color[HTML]{656565} 1,26} & 1,86 \\ \hline
+\multicolumn{1}{|c|}{IP2L-9} & {\color[HTML]{656565} 1,97} & {\color[HTML]{656565} } & 1,97 & {\color[HTML]{656565} 0,80} & {\color[HTML]{656565} } & 0,80 & {\color[HTML]{656565} 0,61} & {\color[HTML]{656565} } & 0,61 & {\color[HTML]{656565} 0,58} & {\color[HTML]{656565} 0,34} & 0,92 & {\color[HTML]{656565} 0,63} & {\color[HTML]{656565} 0,53} & 1,16 & {\color[HTML]{656565} 0,62} & {\color[HTML]{656565} 0,6} & 1,21 \\ \hline
+\multicolumn{1}{|c|}{IP2L-10} & {\color[HTML]{656565} 1,97} & {\color[HTML]{656565} } & 1,97 & {\color[HTML]{656565} 0,80} & {\color[HTML]{656565} } & 0,80 & {\color[HTML]{656565} 0,65} & {\color[HTML]{656565} } & 0,65 & {\color[HTML]{656565} 0,60} & {\color[HTML]{656565} 0,12} & 0,71 & {\color[HTML]{656565} 0,63} & {\color[HTML]{656565} 0,24} & 0,87 & {\color[HTML]{656565} 0,64} & {\color[HTML]{656565} 0,28} & 0,92 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-5} & {\color[HTML]{656565} 1,89} & {\color[HTML]{656565} } & 1,89 & {\color[HTML]{656565} 0,46} & {\color[HTML]{656565} 1,64} & 2,10 & {\color[HTML]{656565} 0,50} & {\color[HTML]{656565} 2,64} & 3,14 & {\color[HTML]{656565} 0,51} & {\color[HTML]{656565} 3,53} & 4,03 & {\color[HTML]{656565} 0,52} & {\color[HTML]{656565} 4,51} & 5,03 & {\color[HTML]{656565} 0,54} & {\color[HTML]{656565} 4,9} & 5,44 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-6} & {\color[HTML]{656565} 1,92} & {\color[HTML]{656565} } & 1,92 & {\color[HTML]{656565} 0,70} & {\color[HTML]{656565} 0,34} & 1,04 & {\color[HTML]{656565} 0,51} & {\color[HTML]{656565} 0,56} & 1,07 & {\color[HTML]{656565} 0,52} & {\color[HTML]{656565} 0,86} & 1,39 & {\color[HTML]{656565} 0,53} & {\color[HTML]{656565} 1,15} & 1,68 & {\color[HTML]{656565} 0,53} & {\color[HTML]{656565} 1,15} & 1,67 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-7} & {\color[HTML]{656565} 1,93} & {\color[HTML]{656565} } & 1,93 & {\color[HTML]{656565} 0,76} & {\color[HTML]{656565} } & 0,76 & {\color[HTML]{656565} 0,54} & {\color[HTML]{656565} 0,44} & 0,98 & {\color[HTML]{656565} 0,53} & {\color[HTML]{656565} 0,38} & 0,91 & {\color[HTML]{656565} 0,56} & {\color[HTML]{656565} 0,44} & 1,01 & {\color[HTML]{656565} 0,56} & {\color[HTML]{656565} 0,47} & 1,03 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-8} & {\color[HTML]{656565} 1,94} & {\color[HTML]{656565} } & 1,94 & {\color[HTML]{656565} 0,78} & {\color[HTML]{656565} } & 0,78 & {\color[HTML]{656565} 0,55} & {\color[HTML]{656565} 0,28} & 0,83 & {\color[HTML]{656565} 0,57} & {\color[HTML]{656565} 0,19} & 0,76 & {\color[HTML]{656565} 0,58} & {\color[HTML]{656565} 0,25} & 0,84 & {\color[HTML]{656565} 0,59} & {\color[HTML]{656565} 0,26} & 0,85 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-9} & {\color[HTML]{656565} 1,95} & {\color[HTML]{656565} } & 1,95 & {\color[HTML]{656565} 0,79} & {\color[HTML]{656565} } & 0,79 & {\color[HTML]{656565} 0,61} & {\color[HTML]{656565} } & 0,61 & {\color[HTML]{656565} 0,60} & {\color[HTML]{656565} 0,14} & 0,74 & {\color[HTML]{656565} 0,61} & {\color[HTML]{656565} 0,16} & 0,78 & {\color[HTML]{656565} 0,61} & {\color[HTML]{656565} 0,17} & 0,78 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10} & {\color[HTML]{656565} 1,97} & {\color[HTML]{656565} } & 1,97 & {\color[HTML]{656565} 0,81} & {\color[HTML]{656565} } & 0,81 & {\color[HTML]{656565} 0,64} & {\color[HTML]{656565} } & 0,64 & {\color[HTML]{656565} 0,59} & {\color[HTML]{656565} 0,07} & 0,65 & {\color[HTML]{656565} 0,63} & {\color[HTML]{656565} 0,08} & 0,71 & {\color[HTML]{656565} 0,63} & {\color[HTML]{656565} 0,09} & 0,72 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-5} & {\color[HTML]{656565} 1,92} & {\color[HTML]{656565} } & 1,92 & {\color[HTML]{656565} 0,53} & {\color[HTML]{656565} 6,56} & 7,09 & {\color[HTML]{656565} 0,56} & {\color[HTML]{656565} 9,75} & 10,31 & {\color[HTML]{656565} 0,58} & {\color[HTML]{656565} 12,11} & 12,68 & {\color[HTML]{656565} 0,59} & {\color[HTML]{656565} 14,11} & 14,71 & {\color[HTML]{656565} 0,67} & {\color[HTML]{656565} 16,91} & 17,58 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-6} & {\color[HTML]{656565} 1,97} & {\color[HTML]{656565} } & 1,97 & {\color[HTML]{656565} 0,80} & {\color[HTML]{656565} 1,58} & 2,37 & {\color[HTML]{656565} 0,66} & {\color[HTML]{656565} 4,78} & 5,44 & {\color[HTML]{656565} 0,57} & {\color[HTML]{656565} 5,92} & 6,49 & {\color[HTML]{656565} 0,59} & {\color[HTML]{656565} 7,25} & 7,84 & {\color[HTML]{656565} 0,70} & {\color[HTML]{656565} 8,41} & 9,11 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-7} & {\color[HTML]{656565} 1,98} & {\color[HTML]{656565} } & 1,98 & {\color[HTML]{656565} 0,81} & {\color[HTML]{656565} } & 0,81 & {\color[HTML]{656565} 0,56} & {\color[HTML]{656565} 2,46} & 3,02 & {\color[HTML]{656565} 0,64} & {\color[HTML]{656565} 3,09} & 3,73 & {\color[HTML]{656565} 0,63} & {\color[HTML]{656565} 4,18} & 4,81 & {\color[HTML]{656565} 0,65} & {\color[HTML]{656565} 4,58} & 5,23 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-8} & {\color[HTML]{656565} 2,12} & {\color[HTML]{656565} } & 2,12 & {\color[HTML]{656565} 0,82} & {\color[HTML]{656565} } & 0,82 & {\color[HTML]{656565} 0,58} & {\color[HTML]{656565} 0,43} & 1,00 & {\color[HTML]{656565} 0,61} & {\color[HTML]{656565} 0,71} & 1,33 & {\color[HTML]{656565} 0,65} & {\color[HTML]{656565} 0,97} & 1,62 & {\color[HTML]{656565} 0,65} & {\color[HTML]{656565} 1,09} & 1,74 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-9} & {\color[HTML]{656565} 2,07} & {\color[HTML]{656565} } & 2,07 & {\color[HTML]{656565} 0,85} & {\color[HTML]{656565} } & 0,85 & {\color[HTML]{656565} 0,82} & {\color[HTML]{656565} } & 0,82 & {\color[HTML]{656565} 0,61} & {\color[HTML]{656565} 0,36} & 0,98 & {\color[HTML]{656565} 0,68} & {\color[HTML]{656565} 0,5} & 1,17 & {\color[HTML]{656565} 0,62} & {\color[HTML]{656565} 0,54} & 1,15 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & {\color[HTML]{656565} 2,08} & {\color[HTML]{656565} } & 2,08 & {\color[HTML]{656565} 0,86} & {\color[HTML]{656565} } & 0,86 & {\color[HTML]{656565} 0,67} & {\color[HTML]{656565} } & 0,67 & {\color[HTML]{656565} 0,60} & {\color[HTML]{656565} 0,12} & 0,71 & {\color[HTML]{656565} 0,92} & {\color[HTML]{656565} 0,27} & 1,19 & {\color[HTML]{656565} 0,65} & {\color[HTML]{656565} 0,25} & 0,90 \\ \hline
+\end{tabular}%
+}
+\caption{Tempo de processamento (ms) dos métodos IP2L, IP2LB e IP2LRB para prefixos de consulta com tamanho $3,5,6,9,11$ e $13$, valores de $\lambda$ variando de $5$ a $10$, e para $\tau=2$ na base de dados AOL.}
+\label{tab:methods-processing-time-tau-2-AOL}
+\end{table}
+
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-19}
+ & \multicolumn{18}{c|}{\textbf{$\tau=2$}} \\ \hline
+\multicolumn{1}{|c|}{} & \multicolumn{3}{c|}{\textbf{$|p|=3$}} & \multicolumn{3}{c|}{\textbf{$|p|=5$}} & \multicolumn{3}{c|}{\textbf{$|p|=7$}} & \multicolumn{3}{c|}{\textbf{$|p|=9$}} & \multicolumn{3}{c|}{\textbf{$|p|=11$}} & \multicolumn{3}{c|}{\textbf{$|p|=13$}} \\ \cline{2-19} 
+\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{método}}} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} \\ \hline
+\multicolumn{1}{|c|}{IP2L-5} & {\color[HTML]{656565} 137,40} & {\color[HTML]{656565} } & 137,40 & {\color[HTML]{656565} 4,15} & {\color[HTML]{656565} 85,93} & 90,08 & {\color[HTML]{656565} 4,39} & {\color[HTML]{656565} 137,62} & 142,02 & {\color[HTML]{656565} 4,78} & {\color[HTML]{656565} 156,54} & 161,32 & {\color[HTML]{656565} 5,00} & {\color[HTML]{656565} 184,45} & 189,45 & {\color[HTML]{656565} 5,02} & {\color[HTML]{656565} 217,55} & 222,57 \\ \hline
+\multicolumn{1}{|c|}{IP2L-6} & {\color[HTML]{656565} 133,11} & {\color[HTML]{656565} } & 133,11 & {\color[HTML]{656565} 5,93} & {\color[HTML]{656565} 29,82} & 35,76 & {\color[HTML]{656565} 4,63} & {\color[HTML]{656565} 41,2} & 45,83 & {\color[HTML]{656565} 5,02} & {\color[HTML]{656565} 56,85} & 61,87 & {\color[HTML]{656565} 5,16} & {\color[HTML]{656565} 69,2} & 74,36 & {\color[HTML]{656565} 5,42} & {\color[HTML]{656565} 83,32} & 88,74 \\ \hline
+\multicolumn{1}{|c|}{IP2L-7} & {\color[HTML]{656565} 133,90} & {\color[HTML]{656565} } & 133,90 & {\color[HTML]{656565} 8,66} & {\color[HTML]{656565} } & 8,66 & {\color[HTML]{656565} 4,45} & {\color[HTML]{656565} 10,93} & 15,38 & {\color[HTML]{656565} 4,93} & {\color[HTML]{656565} 20,44} & 25,37 & {\color[HTML]{656565} 4,96} & {\color[HTML]{656565} 21,4} & 26,36 & {\color[HTML]{656565} 5,20} & {\color[HTML]{656565} 28,4} & 33,60 \\ \hline
+\multicolumn{1}{|c|}{IP2L-8} & {\color[HTML]{656565} 136,30} & {\color[HTML]{656565} } & 136,30 & {\color[HTML]{656565} 8,82} & {\color[HTML]{656565} } & 8,82 & {\color[HTML]{656565} 4,53} & {\color[HTML]{656565} 3,09} & 7,62 & {\color[HTML]{656565} 4,83} & {\color[HTML]{656565} 8,88} & 13,71 & {\color[HTML]{656565} 4,99} & {\color[HTML]{656565} 9,91} & 14,90 & {\color[HTML]{656565} 5,12} & {\color[HTML]{656565} 13,24} & 18,36 \\ \hline
+\multicolumn{1}{|c|}{IP2L-9} & {\color[HTML]{656565} 135,12} & {\color[HTML]{656565} } & 135,12 & {\color[HTML]{656565} 9,02} & {\color[HTML]{656565} } & 9,02 & {\color[HTML]{656565} 4,95} & {\color[HTML]{656565} } & 4,95 & {\color[HTML]{656565} 4,91} & {\color[HTML]{656565} 3,05} & 7,96 & {\color[HTML]{656565} 5,01} & {\color[HTML]{656565} 4,54} & 9,55 & {\color[HTML]{656565} 5,21} & {\color[HTML]{656565} 6,45} & 11,66 \\ \hline
+\multicolumn{1}{|c|}{IP2L-10} & {\color[HTML]{656565} 134,59} & {\color[HTML]{656565} } & 134,59 & {\color[HTML]{656565} 9,24} & {\color[HTML]{656565} } & 9,24 & {\color[HTML]{656565} 5,22} & {\color[HTML]{656565} } & 5,22 & {\color[HTML]{656565} 5,04} & {\color[HTML]{656565} 0,79} & 5,83 & {\color[HTML]{656565} 5,14} & {\color[HTML]{656565} 1,91} & 7,05 & {\color[HTML]{656565} 5,31} & {\color[HTML]{656565} 2,81} & 8,12 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-5} & {\color[HTML]{656565} 135,80} & {\color[HTML]{656565} } & 135,80 & {\color[HTML]{656565} 4,11} & {\color[HTML]{656565} 20,16} & 24,27 & {\color[HTML]{656565} 4,04} & {\color[HTML]{656565} 13,49} & 17,52 & {\color[HTML]{656565} 4,34} & {\color[HTML]{656565} 17,11} & 21,45 & {\color[HTML]{656565} 4,38} & {\color[HTML]{656565} 19,24} & 23,62 & {\color[HTML]{656565} 4,73} & {\color[HTML]{656565} 21,69} & 26,42 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-6} & {\color[HTML]{656565} 133,65} & {\color[HTML]{656565} } & 133,65 & {\color[HTML]{656565} 5,82} & {\color[HTML]{656565} 11,11} & 16,93 & {\color[HTML]{656565} 4,28} & {\color[HTML]{656565} 5,16} & 9,44 & {\color[HTML]{656565} 4,62} & {\color[HTML]{656565} 7,64} & 12,26 & {\color[HTML]{656565} 4,74} & {\color[HTML]{656565} 9,2} & 13,93 & {\color[HTML]{656565} 5,03} & {\color[HTML]{656565} 11,48} & 16,50 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-7} & {\color[HTML]{656565} 133,71} & {\color[HTML]{656565} } & 133,71 & {\color[HTML]{656565} 8,91} & {\color[HTML]{656565} } & 8,91 & {\color[HTML]{656565} 4,39} & {\color[HTML]{656565} 3,04} & 7,43 & {\color[HTML]{656565} 4,65} & {\color[HTML]{656565} 3,09} & 7,74 & {\color[HTML]{656565} 4,84} & {\color[HTML]{656565} 3,89} & 8,74 & {\color[HTML]{656565} 5,12} & {\color[HTML]{656565} 4,84} & 9,96 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-8} & {\color[HTML]{656565} 133,62} & {\color[HTML]{656565} } & 133,62 & {\color[HTML]{656565} 9,04} & {\color[HTML]{656565} } & 9,04 & {\color[HTML]{656565} 4,49} & {\color[HTML]{656565} 1,56} & 6,05 & {\color[HTML]{656565} 4,67} & {\color[HTML]{656565} 1,25} & 5,92 & {\color[HTML]{656565} 4,92} & {\color[HTML]{656565} 1,89} & 6,80 & {\color[HTML]{656565} 5,30} & {\color[HTML]{656565} 2,54} & 7,84 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-9} & {\color[HTML]{656565} 135,07} & {\color[HTML]{656565} } & 135,07 & {\color[HTML]{656565} 8,95} & {\color[HTML]{656565} } & 8,95 & {\color[HTML]{656565} 4,94} & {\color[HTML]{656565} } & 4,94 & {\color[HTML]{656565} 4,85} & {\color[HTML]{656565} 0,96} & 5,80 & {\color[HTML]{656565} 5,03} & {\color[HTML]{656565} 0,93} & 5,97 & {\color[HTML]{656565} 5,44} & {\color[HTML]{656565} 1,39} & 6,83 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10} & {\color[HTML]{656565} 134,60} & {\color[HTML]{656565} } & 134,60 & {\color[HTML]{656565} 9,31} & {\color[HTML]{656565} } & 9,31 & {\color[HTML]{656565} 5,08} & {\color[HTML]{656565} } & 5,08 & {\color[HTML]{656565} 4,99} & {\color[HTML]{656565} 0,54} & 5,54 & {\color[HTML]{656565} 5,08} & {\color[HTML]{656565} 0,45} & 5,53 & {\color[HTML]{656565} 5,59} & {\color[HTML]{656565} 0,69} & 6,28 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-5} & {\color[HTML]{656565} 136,31} & {\color[HTML]{656565} } & 136,31 & {\color[HTML]{656565} 4,36} & {\color[HTML]{656565} 89,91} & 94,27 & {\color[HTML]{656565} 4,89} & {\color[HTML]{656565} 105,91} & 110,81 & {\color[HTML]{656565} 4,90} & {\color[HTML]{656565} 115,56} & 120,46 & {\color[HTML]{656565} 5,14} & {\color[HTML]{656565} 136,14} & 141,28 & {\color[HTML]{656565} 5,09} & {\color[HTML]{656565} 152,69} & 157,78 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-6} & {\color[HTML]{656565} 133,36} & {\color[HTML]{656565} } & 133,36 & {\color[HTML]{656565} 5,96} & {\color[HTML]{656565} 30,36} & 36,32 & {\color[HTML]{656565} 4,74} & {\color[HTML]{656565} 37,07} & 41,82 & {\color[HTML]{656565} 5,27} & {\color[HTML]{656565} 48,9} & 54,16 & {\color[HTML]{656565} 5,31} & {\color[HTML]{656565} 58,76} & 64,07 & {\color[HTML]{656565} 5,32} & {\color[HTML]{656565} 68,33} & 73,65 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-7} & {\color[HTML]{656565} 133,32} & {\color[HTML]{656565} } & 133,32 & {\color[HTML]{656565} 9,11} & {\color[HTML]{656565} } & 9,11 & {\color[HTML]{656565} 4,40} & {\color[HTML]{656565} 11,47} & 15,88 & {\color[HTML]{656565} 5,11} & {\color[HTML]{656565} 16,85} & 21,97 & {\color[HTML]{656565} 5,15} & {\color[HTML]{656565} 17,2} & 22,35 & {\color[HTML]{656565} 5,21} & {\color[HTML]{656565} 22,22} & 27,43 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-8} & {\color[HTML]{656565} 133,62} & {\color[HTML]{656565} } & 133,62 & {\color[HTML]{656565} 9,28} & {\color[HTML]{656565} } & 9,28 & {\color[HTML]{656565} 4,63} & {\color[HTML]{656565} 3,15} & 7,77 & {\color[HTML]{656565} 4,83} & {\color[HTML]{656565} 7,24} & 12,08 & {\color[HTML]{656565} 5,26} & {\color[HTML]{656565} 7,74} & 13,00 & {\color[HTML]{656565} 5,19} & {\color[HTML]{656565} 10,12} & 15,31 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-9} & {\color[HTML]{656565} 133,89} & {\color[HTML]{656565} } & 133,89 & {\color[HTML]{656565} 9,34} & {\color[HTML]{656565} } & 9,34 & {\color[HTML]{656565} 5,28} & {\color[HTML]{656565} } & 5,28 & {\color[HTML]{656565} 5,08} & {\color[HTML]{656565} 3,28} & 8,36 & {\color[HTML]{656565} 5,66} & {\color[HTML]{656565} 3,88} & 9,54 & {\color[HTML]{656565} 5,26} & {\color[HTML]{656565} 5,09} & 10,35 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & {\color[HTML]{656565} 133,78} & {\color[HTML]{656565} } & 133,78 & {\color[HTML]{656565} 9,26} & {\color[HTML]{656565} } & 9,26 & {\color[HTML]{656565} 5,44} & {\color[HTML]{656565} } & 5,44 & {\color[HTML]{656565} 4,96} & {\color[HTML]{656565} 0,81} & 5,76 & {\color[HTML]{656565} 5,42} & {\color[HTML]{656565} 1,65} & 7,07 & {\color[HTML]{656565} 5,44} & {\color[HTML]{656565} 2,19} & 7,64 \\ \hline
+\end{tabular}%
+}
+\caption{Tempo de processamento (ms) dos métodos IP2L, IP2LB e IP2LRB para prefixos de consulta com tamanho $3,5,6,9,11$ e $13$, valores de $\lambda$ variando de $5$ a $10$, e para $\tau=2$ na base de dados USADDR.}
+\label{tab:methods-processing-time-tau-2-USADDR}
+\end{table}
+
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-19}
+ & \multicolumn{18}{c|}{$\tau=3$} \\ \hline
+\multicolumn{1}{|c|}{} & \multicolumn{3}{c|}{\textbf{$|p|=3$}} & \multicolumn{3}{c|}{\textbf{$|p|=5$}} & \multicolumn{3}{c|}{\textbf{$|p|=7$}} & \multicolumn{3}{c|}{\textbf{$|p|=9$}} & \multicolumn{3}{c|}{\textbf{$|p|=11$}} & \multicolumn{3}{c|}{\textbf{$|p|=13$}} \\ \cline{2-19} 
+\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{método}}} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} \\ \hline
+\multicolumn{1}{|c|}{IP2L-5} & {\color[HTML]{656565} 1,89} & {\color[HTML]{656565} 21,59} & 23,48 & {\color[HTML]{656565} 3,66} & {\color[HTML]{656565} 26,66} & 30,33 & {\color[HTML]{656565} 2,44} & {\color[HTML]{656565} 46,62} & 49,06 & {\color[HTML]{656565} 2,55} & {\color[HTML]{656565} 63,39} & 65,95 & {\color[HTML]{656565} 2,74} & {\color[HTML]{656565} 77,6} & 80,34 & {\color[HTML]{656565} 2,75} & {\color[HTML]{656565} 89,67} & 92,42 \\ \hline
+\multicolumn{1}{|c|}{IP2L-6} & {\color[HTML]{656565} 11,53} & {\color[HTML]{656565} } & 11,53 & {\color[HTML]{656565} 2,27} & {\color[HTML]{656565} 21,78} & 24,05 & {\color[HTML]{656565} 2,85} & {\color[HTML]{656565} 39,62} & 42,46 & {\color[HTML]{656565} 2,98} & {\color[HTML]{656565} 53,9} & 56,88 & {\color[HTML]{656565} 3,20} & {\color[HTML]{656565} 65,07} & 68,27 & {\color[HTML]{656565} 3,18} & {\color[HTML]{656565} 74,41} & 77,59 \\ \hline
+\multicolumn{1}{|c|}{IP2L-7} & {\color[HTML]{656565} 11,66} & {\color[HTML]{656565} } & 11,66 & {\color[HTML]{656565} 2,86} & {\color[HTML]{656565} 8,53} & 11,40 & {\color[HTML]{656565} 2,94} & {\color[HTML]{656565} 20,42} & 23,35 & {\color[HTML]{656565} 3,13} & {\color[HTML]{656565} 30,29} & 33,42 & {\color[HTML]{656565} 3,28} & {\color[HTML]{656565} 35,98} & 39,26 & {\color[HTML]{656565} 3,32} & {\color[HTML]{656565} 42,51} & 45,83 \\ \hline
+\multicolumn{1}{|c|}{IP2L-8} & {\color[HTML]{656565} 11,70} & {\color[HTML]{656565} } & 11,70 & {\color[HTML]{656565} 3,21} & {\color[HTML]{656565} } & 3,21 & {\color[HTML]{656565} 2,70} & {\color[HTML]{656565} 8,41} & 11,11 & {\color[HTML]{656565} 2,92} & {\color[HTML]{656565} 13,69} & 16,61 & {\color[HTML]{656565} 3,12} & {\color[HTML]{656565} 18,01} & 21,12 & {\color[HTML]{656565} 3,16} & {\color[HTML]{656565} 20,68} & 23,83 \\ \hline
+\multicolumn{1}{|c|}{IP2L-9} & {\color[HTML]{656565} 11,72} & {\color[HTML]{656565} } & 11,72 & {\color[HTML]{656565} 3,21} & {\color[HTML]{656565} } & 3,21 & {\color[HTML]{656565} 2,57} & {\color[HTML]{656565} 2,46} & 5,04 & {\color[HTML]{656565} 2,80} & {\color[HTML]{656565} 4,87} & 7,67 & {\color[HTML]{656565} 3,04} & {\color[HTML]{656565} 7,02} & 10,06 & {\color[HTML]{656565} 2,96} & {\color[HTML]{656565} 7,95} & 10,91 \\ \hline
+\multicolumn{1}{|c|}{IP2L-10} & {\color[HTML]{656565} 11,81} & {\color[HTML]{656565} } & 11,81 & {\color[HTML]{656565} 3,23} & {\color[HTML]{656565} } & 3,23 & {\color[HTML]{656565} 2,77} & {\color[HTML]{656565} } & 2,77 & {\color[HTML]{656565} 2,71} & {\color[HTML]{656565} 1,39} & 4,10 & {\color[HTML]{656565} 2,95} & {\color[HTML]{656565} 2,19} & 5,15 & {\color[HTML]{656565} 2,96} & {\color[HTML]{656565} 2,59} & 5,55 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-5} & {\color[HTML]{656565} 1,83} & {\color[HTML]{656565} 31,96} & 33,79 & {\color[HTML]{656565} 2,19} & {\color[HTML]{656565} 9,46} & 11,65 & {\color[HTML]{656565} 2,33} & {\color[HTML]{656565} 11,6} & 13,93 & {\color[HTML]{656565} 2,44} & {\color[HTML]{656565} 16,6} & 19,04 & {\color[HTML]{656565} 2,88} & {\color[HTML]{656565} 21,07} & 23,95 & {\color[HTML]{656565} 2,62} & {\color[HTML]{656565} 23,27} & 25,89 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-6} & {\color[HTML]{656565} 11,54} & {\color[HTML]{656565} } & 11,54 & {\color[HTML]{656565} 2,18} & {\color[HTML]{656565} 7,34} & 9,53 & {\color[HTML]{656565} 2,67} & {\color[HTML]{656565} 6,91} & 9,58 & {\color[HTML]{656565} 2,83} & {\color[HTML]{656565} 9,86} & 12,69 & {\color[HTML]{656565} 2,97} & {\color[HTML]{656565} 11,75} & 14,72 & {\color[HTML]{656565} 2,95} & {\color[HTML]{656565} 12,78} & 15,73 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-7} & {\color[HTML]{656565} 11,61} & {\color[HTML]{656565} } & 11,61 & {\color[HTML]{656565} 2,83} & {\color[HTML]{656565} 2,9} & 5,72 & {\color[HTML]{656565} 2,78} & {\color[HTML]{656565} 4,44} & 7,22 & {\color[HTML]{656565} 2,90} & {\color[HTML]{656565} 4,86} & 7,76 & {\color[HTML]{656565} 3,12} & {\color[HTML]{656565} 5,74} & 8,85 & {\color[HTML]{656565} 3,08} & {\color[HTML]{656565} 5,98} & 9,05 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-8} & {\color[HTML]{656565} 11,83} & {\color[HTML]{656565} } & 11,83 & {\color[HTML]{656565} 3,14} & {\color[HTML]{656565} } & 3,14 & {\color[HTML]{656565} 2,59} & {\color[HTML]{656565} 2,57} & 5,17 & {\color[HTML]{656565} 2,81} & {\color[HTML]{656565} 2,36} & 5,17 & {\color[HTML]{656565} 3,07} & {\color[HTML]{656565} 2,99} & 6,06 & {\color[HTML]{656565} 3,00} & {\color[HTML]{656565} 3,07} & 6,08 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-9} & {\color[HTML]{656565} 11,72} & {\color[HTML]{656565} } & 11,72 & {\color[HTML]{656565} 3,20} & {\color[HTML]{656565} } & 3,20 & {\color[HTML]{656565} 2,55} & {\color[HTML]{656565} 1,38} & 3,93 & {\color[HTML]{656565} 2,72} & {\color[HTML]{656565} 1,2} & 3,91 & {\color[HTML]{656565} 2,95} & {\color[HTML]{656565} 1,47} & 4,42 & {\color[HTML]{656565} 2,91} & {\color[HTML]{656565} 1,52} & 4,42 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10} & {\color[HTML]{656565} 11,86} & {\color[HTML]{656565} } & 11,86 & {\color[HTML]{656565} 3,22} & {\color[HTML]{656565} } & 3,22 & {\color[HTML]{656565} 2,77} & {\color[HTML]{656565} } & 2,77 & {\color[HTML]{656565} 2,71} & {\color[HTML]{656565} 0,72} & 3,43 & {\color[HTML]{656565} 2,92} & {\color[HTML]{656565} 0,81} & 3,73 & {\color[HTML]{656565} 2,92} & {\color[HTML]{656565} 0,83} & 3,74 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-5} & {\color[HTML]{656565} 1,85} & {\color[HTML]{656565} 21,23} & 23,07 & {\color[HTML]{656565} 2,52} & {\color[HTML]{656565} 27,01} & 29,54 & {\color[HTML]{656565} 2,65} & {\color[HTML]{656565} 39,68} & 42,33 & {\color[HTML]{656565} 2,74} & {\color[HTML]{656565} 51,56} & 54,30 & {\color[HTML]{656565} 2,83} & {\color[HTML]{656565} 62,21} & 65,05 & {\color[HTML]{656565} 2,98} & {\color[HTML]{656565} 72,22} & 75,20 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-6} & {\color[HTML]{656565} 11,61} & {\color[HTML]{656565} } & 11,61 & {\color[HTML]{656565} 2,89} & {\color[HTML]{656565} 22,08} & 24,97 & {\color[HTML]{656565} 3,02} & {\color[HTML]{656565} 37,14} & 40,16 & {\color[HTML]{656565} 3,14} & {\color[HTML]{656565} 49,25} & 52,39 & {\color[HTML]{656565} 3,38} & {\color[HTML]{656565} 57,6} & 60,98 & {\color[HTML]{656565} 3,53} & {\color[HTML]{656565} 67,63} & 71,15 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-7} & {\color[HTML]{656565} 11,66} & {\color[HTML]{656565} } & 11,66 & {\color[HTML]{656565} 3,15} & {\color[HTML]{656565} 8,77} & 11,92 & {\color[HTML]{656565} 3,06} & {\color[HTML]{656565} 21,18} & 24,24 & {\color[HTML]{656565} 3,17} & {\color[HTML]{656565} 28,11} & 31,28 & {\color[HTML]{656565} 3,41} & {\color[HTML]{656565} 33,16} & 36,58 & {\color[HTML]{656565} 3,52} & {\color[HTML]{656565} 39,14} & 42,66 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-8} & {\color[HTML]{656565} 11,97} & {\color[HTML]{656565} } & 11,97 & {\color[HTML]{656565} 3,28} & {\color[HTML]{656565} } & 3,28 & {\color[HTML]{656565} 2,96} & {\color[HTML]{656565} 8,67} & 11,63 & {\color[HTML]{656565} 2,94} & {\color[HTML]{656565} 13,87} & 16,81 & {\color[HTML]{656565} 3,24} & {\color[HTML]{656565} 17,04} & 20,28 & {\color[HTML]{656565} 3,31} & {\color[HTML]{656565} 19,82} & 23,13 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-9} & {\color[HTML]{656565} 12,17} & {\color[HTML]{656565} } & 12,17 & {\color[HTML]{656565} 3,48} & {\color[HTML]{656565} } & 3,48 & {\color[HTML]{656565} 3,04} & {\color[HTML]{656565} 2,57} & 5,61 & {\color[HTML]{656565} 3,07} & {\color[HTML]{656565} 4,93} & 8,00 & {\color[HTML]{656565} 3,37} & {\color[HTML]{656565} 6,88} & 10,24 & {\color[HTML]{656565} 3,30} & {\color[HTML]{656565} 7,72} & 11,02 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & {\color[HTML]{656565} 11,85} & {\color[HTML]{656565} } & 11,85 & {\color[HTML]{656565} 3,56} & {\color[HTML]{656565} } & 3,56 & {\color[HTML]{656565} 2,94} & {\color[HTML]{656565} } & 2,94 & {\color[HTML]{656565} 3,11} & {\color[HTML]{656565} 1,43} & 4,55 & {\color[HTML]{656565} 3,40} & {\color[HTML]{656565} 2,29} & 5,70 & {\color[HTML]{656565} 2,96} & {\color[HTML]{656565} 2,49} & 5,45 \\ \hline
+\end{tabular}%
+}
+\caption{Tempo de processamento (ms) dos métodos IP2L, IP2LB e IP2LRB para prefixos de consulta com tamanho $3,5,6,9,11$ e $13$, valores de $\lambda$ variando de $5$ a $10$, e para $\tau=3$ na base de dados AOL.}
+\label{tab:methods-processing-time-tau-3-AOL}
+\end{table}
+
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\cline{2-19}
+ & \multicolumn{18}{c|}{\textbf{$\tau=3$}} \\ \hline
+\multicolumn{1}{|c|}{} & \multicolumn{3}{c|}{\textbf{$|p|=3$}} & \multicolumn{3}{c|}{\textbf{$|p|=5$}} & \multicolumn{3}{c|}{\textbf{$|p|=7$}} & \multicolumn{3}{c|}{\textbf{$|p|=9$}} & \multicolumn{3}{c|}{\textbf{$|p|=11$}} & \multicolumn{3}{c|}{\textbf{$|p|=13$}} \\ \cline{2-19} 
+\multicolumn{1}{|c|}{\multirow{-2}{*}{\textbf{método}}} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} & \textbf{1º} & \textbf{2º} & \textbf{total} \\ \hline
+\multicolumn{1}{|c|}{IP2L-5} & {\color[HTML]{656565} 41,39} & {\color[HTML]{656565} 1625,46} & 1666,86 & {\color[HTML]{656565} 53,27} & {\color[HTML]{656565} 593,77} & 647,05 & {\color[HTML]{656565} 56,90} & {\color[HTML]{656565} 977,63} & 1034,54 & {\color[HTML]{656565} 63,45} & {\color[HTML]{656565} 1233,59} & 1297,04 & {\color[HTML]{656565} 69,20} & {\color[HTML]{656565} 1514,61} & 1583,81 & {\color[HTML]{656565} 74,64} & {\color[HTML]{656565} 1790,53} & 1865,17 \\ \hline
+\multicolumn{1}{|c|}{IP2L-6} & {\color[HTML]{656565} 757,67} & {\color[HTML]{656565} } & 757,67 & {\color[HTML]{656565} 58,56} & {\color[HTML]{656565} 445,29} & 503,85 & {\color[HTML]{656565} 71,06} & {\color[HTML]{656565} 550,25} & 621,31 & {\color[HTML]{656565} 77,33} & {\color[HTML]{656565} 688,58} & 765,90 & {\color[HTML]{656565} 84,22} & {\color[HTML]{656565} 812,75} & 896,98 & {\color[HTML]{656565} 97,82} & {\color[HTML]{656565} 983,63} & 1081,45 \\ \hline
+\multicolumn{1}{|c|}{IP2L-7} & {\color[HTML]{656565} 762,05} & {\color[HTML]{656565} } & 762,05 & {\color[HTML]{656565} 77,60} & {\color[HTML]{656565} 268,94} & 346,54 & {\color[HTML]{656565} 78,44} & {\color[HTML]{656565} 327,75} & 406,19 & {\color[HTML]{656565} 80,88} & {\color[HTML]{656565} 420,2} & 501,08 & {\color[HTML]{656565} 87,99} & {\color[HTML]{656565} 502,22} & 590,21 & {\color[HTML]{656565} 92,55} & {\color[HTML]{656565} 602,49} & 695,04 \\ \hline
+\multicolumn{1}{|c|}{IP2L-8} & {\color[HTML]{656565} 763,83} & {\color[HTML]{656565} } & 763,83 & {\color[HTML]{656565} 119,97} & {\color[HTML]{656565} } & 119,97 & {\color[HTML]{656565} 71,12} & {\color[HTML]{656565} 129,78} & 200,90 & {\color[HTML]{656565} 80,09} & {\color[HTML]{656565} 177,22} & 257,31 & {\color[HTML]{656565} 84,63} & {\color[HTML]{656565} 206,1} & 290,73 & {\color[HTML]{656565} 88,22} & {\color[HTML]{656565} 245,58} & 333,80 \\ \hline
+\multicolumn{1}{|c|}{IP2L-9} & {\color[HTML]{656565} 761,45} & {\color[HTML]{656565} } & 761,45 & {\color[HTML]{656565} 124,54} & {\color[HTML]{656565} } & 124,54 & {\color[HTML]{656565} 73,61} & {\color[HTML]{656565} 31,91} & 105,52 & {\color[HTML]{656565} 80,44} & {\color[HTML]{656565} 55,04} & 135,48 & {\color[HTML]{656565} 83,15} & {\color[HTML]{656565} 70,06} & 153,21 & {\color[HTML]{656565} 86,41} & {\color[HTML]{656565} 83,45} & 169,85 \\ \hline
+\multicolumn{1}{|c|}{IP2L-10} & {\color[HTML]{656565} 777,05} & {\color[HTML]{656565} } & 777,05 & {\color[HTML]{656565} 124,02} & {\color[HTML]{656565} } & 124,02 & {\color[HTML]{656565} 77,19} & {\color[HTML]{656565} } & 77,19 & {\color[HTML]{656565} 79,20} & {\color[HTML]{656565} 15,92} & 95,12 & {\color[HTML]{656565} 84,51} & {\color[HTML]{656565} 22,43} & 106,94 & {\color[HTML]{656565} 87,83} & {\color[HTML]{656565} 29,22} & 117,05 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-5} & {\color[HTML]{656565} 36,97} & {\color[HTML]{656565} 1795,61} & 1832,59 & {\color[HTML]{656565} 53,68} & {\color[HTML]{656565} 256,66} & 310,34 & {\color[HTML]{656565} 61,36} & {\color[HTML]{656565} 157,97} & 219,33 & {\color[HTML]{656565} 65,11} & {\color[HTML]{656565} 179,83} & 244,94 & {\color[HTML]{656565} 69,46} & {\color[HTML]{656565} 215,19} & 284,65 & {\color[HTML]{656565} 75,59} & {\color[HTML]{656565} 246,6} & 322,20 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-6} & {\color[HTML]{656565} 753,98} & {\color[HTML]{656565} } & 753,98 & {\color[HTML]{656565} 60,19} & {\color[HTML]{656565} 246,68} & 306,87 & {\color[HTML]{656565} 72,04} & {\color[HTML]{656565} 134,18} & 206,22 & {\color[HTML]{656565} 91,43} & {\color[HTML]{656565} 144,78} & 236,21 & {\color[HTML]{656565} 83,84} & {\color[HTML]{656565} 160,45} & 244,29 & {\color[HTML]{656565} 90,18} & {\color[HTML]{656565} 180,22} & 270,40 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-7} & {\color[HTML]{656565} 776,22} & {\color[HTML]{656565} } & 776,22 & {\color[HTML]{656565} 79,32} & {\color[HTML]{656565} 163,18} & 242,50 & {\color[HTML]{656565} 72,95} & {\color[HTML]{656565} 76,95} & 149,90 & {\color[HTML]{656565} 81,90} & {\color[HTML]{656565} 82,62} & 164,52 & {\color[HTML]{656565} 90,41} & {\color[HTML]{656565} 95,85} & 186,26 & {\color[HTML]{656565} 95,57} & {\color[HTML]{656565} 108,26} & 203,82 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-8} & {\color[HTML]{656565} 767,97} & {\color[HTML]{656565} } & 767,97 & {\color[HTML]{656565} 120,75} & {\color[HTML]{656565} } & 120,75 & {\color[HTML]{656565} 71,36} & {\color[HTML]{656565} 39,17} & 110,53 & {\color[HTML]{656565} 95,76} & {\color[HTML]{656565} 38,54} & 134,30 & {\color[HTML]{656565} 86,43} & {\color[HTML]{656565} 41,6} & 128,03 & {\color[HTML]{656565} 90,55} & {\color[HTML]{656565} 49,52} & 140,06 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-9} & {\color[HTML]{656565} 761,63} & {\color[HTML]{656565} } & 761,63 & {\color[HTML]{656565} 124,65} & {\color[HTML]{656565} } & 124,65 & {\color[HTML]{656565} 74,05} & {\color[HTML]{656565} 14,17} & 88,21 & {\color[HTML]{656565} 79,34} & {\color[HTML]{656565} 17,14} & 96,48 & {\color[HTML]{656565} 83,38} & {\color[HTML]{656565} 18,81} & 102,20 & {\color[HTML]{656565} 88,58} & {\color[HTML]{656565} 22,19} & 110,76 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10} & {\color[HTML]{656565} 762,56} & {\color[HTML]{656565} } & 762,56 & {\color[HTML]{656565} 123,70} & {\color[HTML]{656565} } & 123,70 & {\color[HTML]{656565} 77,57} & {\color[HTML]{656565} } & 77,57 & {\color[HTML]{656565} 78,73} & {\color[HTML]{656565} 7,7} & 86,43 & {\color[HTML]{656565} 82,84} & {\color[HTML]{656565} 7,84} & 90,67 & {\color[HTML]{656565} 87,37} & {\color[HTML]{656565} 9,88} & 97,25 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-5} & {\color[HTML]{656565} 40,79} & {\color[HTML]{656565} 1614,34} & 1655,14 & {\color[HTML]{656565} 53,94} & {\color[HTML]{656565} 622,48} & 676,42 & {\color[HTML]{656565} 57,86} & {\color[HTML]{656565} 609,44} & 667,30 & {\color[HTML]{656565} 64,44} & {\color[HTML]{656565} 729,97} & 794,41 & {\color[HTML]{656565} 71,53} & {\color[HTML]{656565} 885,04} & 956,57 & {\color[HTML]{656565} 75,67} & {\color[HTML]{656565} 1036,04} & 1111,71 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-6} & {\color[HTML]{656565} 757,52} & {\color[HTML]{656565} } & 757,52 & {\color[HTML]{656565} 59,61} & {\color[HTML]{656565} 446,8} & 506,41 & {\color[HTML]{656565} 71,78} & {\color[HTML]{656565} 507,34} & 579,12 & {\color[HTML]{656565} 77,71} & {\color[HTML]{656565} 584,64} & 662,35 & {\color[HTML]{656565} 85,72} & {\color[HTML]{656565} 687,85} & 773,56 & {\color[HTML]{656565} 91,75} & {\color[HTML]{656565} 827,45} & 919,19 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-7} & {\color[HTML]{656565} 758,10} & {\color[HTML]{656565} } & 758,10 & {\color[HTML]{656565} 77,28} & {\color[HTML]{656565} 266,47} & 343,75 & {\color[HTML]{656565} 73,56} & {\color[HTML]{656565} 331,23} & 404,79 & {\color[HTML]{656565} 81,73} & {\color[HTML]{656565} 403,39} & 485,13 & {\color[HTML]{656565} 87,21} & {\color[HTML]{656565} 481,91} & 569,12 & {\color[HTML]{656565} 93,28} & {\color[HTML]{656565} 560,85} & 654,14 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-8} & {\color[HTML]{656565} 756,98} & {\color[HTML]{656565} } & 756,98 & {\color[HTML]{656565} 119,51} & {\color[HTML]{656565} } & 119,51 & {\color[HTML]{656565} 73,81} & {\color[HTML]{656565} 126,84} & 200,64 & {\color[HTML]{656565} 83,00} & {\color[HTML]{656565} 173,06} & 256,07 & {\color[HTML]{656565} 89,44} & {\color[HTML]{656565} 195,64} & 285,08 & {\color[HTML]{656565} 89,38} & {\color[HTML]{656565} 240,48} & 329,86 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-9} & {\color[HTML]{656565} 758,85} & {\color[HTML]{656565} } & 758,85 & {\color[HTML]{656565} 122,46} & {\color[HTML]{656565} } & 122,46 & {\color[HTML]{656565} 74,57} & {\color[HTML]{656565} 31,53} & 106,10 & {\color[HTML]{656565} 79,59} & {\color[HTML]{656565} 56,64} & 136,23 & {\color[HTML]{656565} 84,99} & {\color[HTML]{656565} 67,52} & 152,51 & {\color[HTML]{656565} 87,77} & {\color[HTML]{656565} 79,25} & 167,02 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & {\color[HTML]{656565} 761,06} & {\color[HTML]{656565} } & 761,06 & {\color[HTML]{656565} 124,05} & {\color[HTML]{656565} } & 124,05 & {\color[HTML]{656565} 78,20} & {\color[HTML]{656565} } & 78,20 & {\color[HTML]{656565} 81,38} & {\color[HTML]{656565} 16,18} & 97,56 & {\color[HTML]{656565} 84,00} & {\color[HTML]{656565} 21,68} & 105,68 & {\color[HTML]{656565} 87,05} & {\color[HTML]{656565} 27,47} & 114,52 \\ \hline
+\end{tabular}%
+}
+\caption{Tempo de processamento (ms) dos métodos IP2L, IP2LB e IP2LRB para prefixos de consulta com tamanho $3,5,6,9,11$ e $13$, valores de $\lambda$ variando de $5$ a $10$, e para $\tau=3$ na base de dados USADDR.}
+\label{tab:methods-processing-time-tau-3-USADDR}
+\end{table}
 
 \newpage
-\begin{table}[h]
+\newpage
+\subsubsection{Consumo de memória}
+
+
+\begin{table}[]
 \centering
-\begin{tabular}{|c|c|}
-\hline
-\textbf{alg.} & \textbf{Memória Utilizada (MB)} \\ \hline
-IP2LB-6 & 1528.575 \\ \hline
-IP2L-6 & 1528.487 \\ \hline
-ICPAN & 9101.487 \\ \hline
-ICAN & 9125.932 \\ \hline
-META & 7618.745 \\ \hline
+\begin{tabular}{c|c|c|c|}
+\cline{2-4}
+\multicolumn{1}{l|}{} & \textbf{AOL} & \textbf{USADDR} & \textbf{JUSBRASIL} \\ \hline
+\multicolumn{1}{|c|}{\textbf{Método}} & \textbf{Memória (MB)} & \textbf{Memória (MB)} & \textbf{Memória (MB)} \\ \hline
+\multicolumn{1}{|c|}{IP2L-5} & 48,38 & 2045,02 & 5642,83 \\ \hline
+\multicolumn{1}{|c|}{IP2L-6} & 51,47 & 1836,53 & 5429,17 \\ \hline
+\multicolumn{1}{|c|}{IP2L-7} & 62,30 & 2164,81 & 4931,72 \\ \hline
+\multicolumn{1}{|c|}{IP2L-8} & 75,47 & 2638,38 & 5269,14 \\ \hline
+\multicolumn{1}{|c|}{IP2L-9} & 90,70 & 3276,57 & 5855,33 \\ \hline
+\multicolumn{1}{|c|}{IP2L-10} & 107,11 & 4070,68 & 6747,79 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-5} & 44,77 & 1728,27 & 5183,56 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-6} & 51,50 & 1836,58 & 4809,27 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-7} & 62,30 & 2164,80 & 4931,55 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-8} & 75,49 & 2638,28 & 5269,16 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-9} & 90,75 & 3276,46 & 5855,43 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10} & 107,25 & 4070,73 & 6747,86 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-5} & 48,44 & 2045,03 & 5642,94 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-6} & 51,52 & 1836,45 & 5429,27 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-7} & 62,32 & 2164,83 & 4931,63 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-8} & 75,50 & 2638,39 & 5269,27 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-9} & 90,56 & 3276,63 & 5855,32 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & 107,19 & 4070,71 & 6747,76 \\ \hline
 \end{tabular}
-\caption{Quantidades de memória em \textit{MegaBytes} utilizada por cada método, considerando $\lambda = 6$ para os métodos IP2LB e IP2L.}
-\label{tab:memory-usage-baselines-usaddr-tau-3}
+\caption{Quantidades de memória em \textit{MegaBytes} utilizada pelos métodos IP2L, IP2LB, e IP2LRB, variando o parâmetro $\lambda$ de $5$ até $10$, para as bases AOL, USADDR, e JUSBRASIL.}
+\label{tab:methods-memory-consumption}
 \end{table}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/memory_usage_baselines_dataset_usaddr_tau_3.png}
-    \caption{Gráfico de barras para as quantidades de memória em \textit{MegaBytes} utilizada por cada método, considerando $\lambda = 6$ para os métodos IP2LB e IP2L.}
-    \label{fig:memory-usage-baselines-usaddr-tau-3}
-\end{figure} 
 
-\cleardoublepage
+
+\subsection{Impactos da busca binária na acurácia dos métodos em dois níveis}
+
+
+
+\subsubsection{A métrica F1-Score}
+
+\textbf{TODO: FALAR SOBRE A MÉTRICA F1-SCORE E COMO O BEVA FOI ESTABELECIDO COMO REFERÊNCIA PARA A MÉTRICA}
+
+
+\subsubsection{Experimentos com a base de dados da Jusbrasil}
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+
+\begin{table}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{c|c|c|c|c|c|c|c}
+\cline{2-7}
+\textbf{} & \multicolumn{2}{c|}{$\tau=1$} & \multicolumn{2}{c|}{$\tau=2$} & \multicolumn{2}{c|}{$\tau=3$} &  \\ \hline
+\multicolumn{1}{|c|}{\textbf{método}} & \textbf{Tempo de proc.} & \textbf{F1-Score} & \textbf{Tempo de proc.} & \textbf{F1-Score} & \textbf{Tempo de proc.} & \textbf{F1-Score} & \multicolumn{1}{c|}{\textbf{\begin{tabular}[c]{@{}c@{}}Média \\ mem. (MB)\end{tabular}}} \\ \hline
+\multicolumn{1}{|c|}{IP2LB-5} & 48,00 & 86,35 & 189,08 & 92,71 & 1642,66 & 95,70 & \multicolumn{1}{c|}{4604,35} \\ \hline
+\multicolumn{1}{|c|}{IP2LB-6} & 31,33 & 86,19 & 136,07 & 92,80 & 1145,92 & 96,07 & \multicolumn{1}{c|}{4526,59} \\ \hline
+\multicolumn{1}{|c|}{IP2LB-7} & 17,86 & 86,44 & 76,48 & 92,67 & 720,42 & 96,72 & \multicolumn{1}{c|}{4680,68} \\ \hline
+\multicolumn{1}{|c|}{IP2LB-8} & 12,78 & 86,13 & 49,68 & 92,75 & 328,13 & 96,54 & \multicolumn{1}{c|}{5018,23} \\ \hline
+\multicolumn{1}{|c|}{IP2LB-9} & 7,72 & 86,24 & 35,60 & 92,49 & 192,10 & 96,73 & \multicolumn{1}{c|}{5604,42} \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10} & 5,47 & 86,27 & 27,61 & 92,39 & 155,62 & 96,68 & \multicolumn{1}{c|}{6496,88} \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-5} & 90,79 & 86,37 & 1170,75 & 93,09 & 8907,34 & 96,29 & \multicolumn{1}{c|}{4757,45} \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-6} & 40,34 & 86,44 & 604,66 & 93,34 & 7339,66 & 96,60 & \multicolumn{1}{c|}{4733,30} \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-7} & 23,79 & 86,69 & 214,88 & 93,70 & 5112,13 & 97,23 & \multicolumn{1}{c|}{4680,71} \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-8} & 16,87 & 86,52 & 92,02 & 93,81 & 1778,79 & 97,47 & \multicolumn{1}{c|}{5018,26} \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-9} & 10,75 & 86,30 & 64,30 & 93,78 & 567,71 & 97,53 & \multicolumn{1}{c|}{5604,40} \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & 7,70 & 86,58 & 49,50 & 93,81 & 279,60 & 97,60 & \multicolumn{1}{c|}{6496,84} \\ \hline
+\multicolumn{1}{|c|}{BEVA} & 1,03 & 100 & 10,52 & 100 & 63,35 & 100 & \multicolumn{1}{c|}{19232,79} \\ \hline
+\end{tabular}%
+}
+\caption{Tempo de processamento (ms), F1-Score e média de uso de memória (\textit{MegaBytes)} para o método BEVA e os métodos IP2LB e IP2LRB, variando o parâmetro $\lambda$ de $5$ a $10$ e $\tau$ de $1$ a $3$ na base de dados JUSBRASIL.}
+\label{tab:f1-score-jusbrasil}
+\end{table}
+
+% Please add the following required packages to your document preamble:
+% \usepackage{graphicx}
+\begin{table}[ht]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{c|c|c|c|c|c|c|c|c|c|}
+\cline{2-10}
+\textbf{}                       & \multicolumn{3}{c|}{$\tau=1$} & \multicolumn{3}{c|}{$\tau=2$} & \multicolumn{3}{c|}{$\tau=3$} \\ \hline
+\multicolumn{1}{|c|}{\textbf{Método}} &
+  \textbf{\begin{tabular}[c]{@{}c@{}}Nós \\ Ativos\end{tabular}} &
+  \textbf{\begin{tabular}[c]{@{}c@{}}Ativação \\ busca bin.\end{tabular}} &
+  \textbf{F1-Score} &
+  \textbf{\begin{tabular}[c]{@{}c@{}}Nós \\ Ativos\end{tabular}} &
+  \textbf{\begin{tabular}[c]{@{}c@{}}Ativação \\ busca bin.\end{tabular}} &
+  \textbf{F1-Score} &
+  \textbf{\begin{tabular}[c]{@{}c@{}}Nós \\ Ativos\end{tabular}} &
+  \textbf{\begin{tabular}[c]{@{}c@{}}Ativação \\ busca bin.\end{tabular}} &
+  \textbf{F1-Score} \\ \hline
+\multicolumn{1}{|c|}{IP2LB-5}   & 84,98   & 97,50\%   & 86,35   & 2858,21   & 98,15\%  & 92,71  & 26935,19  & 96,32\%  & 95,70  \\ \hline
+\multicolumn{1}{|c|}{IP2LB-6}   & 59,18   & 94,82\%   & 86,19   & 2064,35   & 97,30\%  & 92,80  & 27976,40  & 97,14\%  & 96,07  \\ \hline
+\multicolumn{1}{|c|}{IP2LB-7}   & 40,98   & 91,42\%   & 86,44   & 1228,55   & 94,55\%  & 92,67  & 23171,90  & 96,98\%  & 96,72  \\ \hline
+\multicolumn{1}{|c|}{IP2LB-8}   & 32,78   & 88,44\%   & 86,13   & 678,04    & 89,66\%  & 92,75  & 15020,53  & 95,24\%  & 96,54  \\ \hline
+\multicolumn{1}{|c|}{IP2LB-9}   & 28,30   & 85,39\%   & 86,24   & 428,66    & 83,32\%  & 92,49  & 8289,18   & 91,59\%  & 96,73  \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10}  & 24,84   & 81,94\%   & 86,27   & 317,95    & 76,96\%  & 92,39  & 4625,44   & 84,77\%  & 96,68  \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-5}  & 84,98   & 41,23\%   & 86,37   & 2858,21   & 22,04\%  & 93,09  & 26935,19  & 22,15\%  & 96,29  \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-6}  & 59,18   & 37,42\%   & 86,44   & 2064,35   & 16,79\%  & 93,34  & 27976,40  & 14,14\%  & 96,60  \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-7}  & 40,98   & 40,01\%   & 86,69   & 1228,55   & 14,85\%  & 93,70  & 23171,90  & 8,99\%   & 97,23  \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-8}  & 32,78   & 40,62\%   & 86,52   & 678,04    & 15,92\%  & 93,81  & 15020,53  & 6,69\%   & 97,47  \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-9}  & 28,30   & 40,51\%   & 86,30   & 428,66    & 16,81\%  & 93,78  & 8289,18   & 6,25\%   & 97,53  \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & 24,84   & 39,17\%   & 86,58   & 317,95    & 17,86\%  & 93,81  & 4625,44   & 6,95\%   & 97,60  \\ \hline
+\end{tabular}%
+}
+\caption{Média de nós ativos, percentual médio que indica em quanto dos nós ativos foi realizada a busca binária e F1-Score para os métodos IP2LB e IP2LRB, variando $\lambda$ de $5$ a $10$ e o $\tau$ de $1$ a $3$, na base JUSBRASIL.}
+\label{tab:binary-search-activation}
+\end{table}
+
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+
+
+\subsection{Comparação com os Métodos de Base}
+\subsubsection{Variando o valor do Limiar de Distância de Edição}
+
+
+\begin{table}[]
+\centering
+\begin{tabular}{c|c|c|c|c|c|c|}
+\cline{2-7}
+\multicolumn{1}{l|}{} & \multicolumn{3}{c|}{\textbf{AOL}} & \multicolumn{3}{c|}{\textbf{USADDR}} \\ \hline
+\multicolumn{1}{|c|}{\textbf{Método}} & $\tau=1$ & $\tau=2$ & $\tau=3$ & $\tau=1$ & $\tau=2$ & $\tau=3$ \\ \hline
+\multicolumn{1}{|c|}{IP2L-10} & 0,15 & 0,80 & 3,23 & 0,70 & 9,24 & 124,02 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10} & 0,15 & 0,81 & 3,22 & 0,70 & 9,31 & 123,70 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & 0,16 & 0,86 & 3,56 & 0,72 & 9,26 & 124,05 \\ \hline
+\multicolumn{1}{|c|}{ICAN} & 0,09 & 1,59 & 10,97 & 0,30 & 8,14 & 165,98 \\ \hline
+\multicolumn{1}{|c|}{ICPAN} & 0,17 & 1,05 & 4,22 & 0,73 & 10,79 & 154,05 \\ \hline
+\multicolumn{1}{|c|}{BEVA} & 0,25 & 1,42 & 3,92 & 0,72 & 9,31 & 51,85 \\ \hline
+\multicolumn{1}{|c|}{META} & 0,07 & 1,46 & 25,88 & 0,33 & 52,31 & 4572,78 \\ \hline
+\end{tabular}
+\caption{}
+\label{tab:baselines-varying-tau-p-5}
+\end{table}
+
+
+\begin{table}[]
+\centering
+\begin{tabular}{c|c|c|c|c|c|c|}
+\cline{2-7}
+ & \multicolumn{3}{c|}{\textbf{AOL}} & \multicolumn{3}{c|}{\textbf{USADDR}} \\ \hline
+\multicolumn{1}{|c|}{\textbf{Método}} & $\tau=1$ & $\tau=2$ & $\tau=3$ & $\tau=1$ & $\tau=2$ & $\tau=3$ \\ \hline
+\multicolumn{1}{|c|}{IP2L-10} & 0,10 & 0,92 & 5,55 & 0,64 & 8,12 & 117,05 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10} & 0,07 & 0,72 & 3,74 & 0,31 & 6,28 & 97,25 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & 0,10 & 0,90 & 5,45 & 0,41 & 7,64 & 114,52 \\ \hline
+\multicolumn{1}{|c|}{ICAN} & 0,11 & 1,90 & 13,89 & 0,34 & 10,20 & 215,06 \\ \hline
+\multicolumn{1}{|c|}{ICPAN} & 0,10 & 1,02 & 4,75 & 0,35 & 8,07 & 130,38 \\ \hline
+\multicolumn{1}{|c|}{BEVA} & 0,33 & 1,80 & 5,49 & 0,92 & 12,13 & 78,85 \\ \hline
+\multicolumn{1}{|c|}{META} & 0,20 & 2,95 & 38,81 & 0,80 & 74,64 & 6006,38 \\ \hline
+\end{tabular}
+\caption{}
+\label{tab:baselines-varying-tau-p-13}
+\end{table}
+
+\subsubsection{Variando o Tamanho do Prefixo de Consulta}
+
+
+\begin{table}[]
+\centering
+\begin{tabular}{c|c|c|c|c|c|c|}
+\cline{2-7}
+\multicolumn{1}{l|}{} & \multicolumn{6}{c|}{\textbf{AOL}} \\ \hline
+\multicolumn{1}{|c|}{\textbf{Método}} & $|p| =  3$ & $|p| =  5$ & $|p| =  7$ & $|p| =  9$ & $|p| =  11$ & $|p| =  13$ \\ \hline
+\multicolumn{1}{|c|}{IP2L-10} & 11,81 & 3,23 & 2,77 & 4,10 & 5,15 & 5,55 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10} & 11,86 & 3,22 & 2,77 & 3,43 & 3,73 & 3,74 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & 11,85 & 3,56 & 2,94 & 4,55 & 5,70 & 5,45 \\ \hline
+\multicolumn{1}{|c|}{ICAN} & 14,31 & 10,97 & 12,40 & 12,99 & 13,93 & 13,89 \\ \hline
+\multicolumn{1}{|c|}{ICPAN} & 11,21 & 4,22 & 4,17 & 4,41 & 4,70 & 4,75 \\ \hline
+\multicolumn{1}{|c|}{BEVA} & 0,00 & 3,92 & 4,90 & 5,22 & 5,45 & 5,49 \\ \hline
+\multicolumn{1}{|c|}{META} & 11,27 & 25,88 & 31,77 & 34,76 & 37,57 & 38,81 \\ \hline
+\end{tabular}
+\caption{}
+\label{tab:baselines-varying-prefix-size-AOL}
+\end{table}
+
+\begin{table}[]
+\centering
+\begin{tabular}{c|c|c|c|c|c|c|}
+\cline{2-7}
+\multicolumn{1}{l|}{} & \multicolumn{6}{c|}{\textbf{USADDR}} \\ \hline
+\multicolumn{1}{|c|}{\textbf{Método}} & $|p| =  3$ & $|p| =  5$ & $|p| =  7$ & $|p| =  9$ & $|p| =  11$ & $|p| =  13$ \\ \hline
+\multicolumn{1}{|c|}{IP2L-10} & 777,05 & 124,02 & 77,19 & 95,12 & 106,94 & 117,05 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10} & 762,56 & 123,70 & 77,57 & 86,43 & 90,67 & 97,25 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & 761,06 & 124,05 & 78,20 & 97,56 & 105,68 & 114,52 \\ \hline
+\multicolumn{1}{|c|}{ICAN} & 381,29 & 165,98 & 171,89 & 217,98 & 208,36 & 215,06 \\ \hline
+\multicolumn{1}{|c|}{ICPAN} & 759,18 & 154,05 & 110,71 & 115,35 & 124,94 & 130,38 \\ \hline
+\multicolumn{1}{|c|}{BEVA} & 0,01 & 51,85 & 68,33 & 75,49 & 77,23 & 78,85 \\ \hline
+\multicolumn{1}{|c|}{META} & 2400,16 & 4572,78 & 5140,76 & 5656,81 & 5864,68 & 6006,38 \\ \hline
+\end{tabular}
+\caption{}
+\label{tab:baselines-varying-prefix-size-USADDR}
+\end{table}
+
+\subsubsection{Consumo de memória}
+
+\begin{table}[]
+\centering
+\begin{tabular}{c|c|c|c|}
+\cline{2-4}
+\multicolumn{1}{l|}{} & \textbf{AOL} & \textbf{USADDR} & \textbf{JUSBRASIL} \\ \hline
+\multicolumn{1}{|c|}{\textbf{Método}} & \textbf{Memória (MB)} & \textbf{Memória (MB)} & \textbf{Memória (MB)} \\ \hline
+\multicolumn{1}{|c|}{IP2L-10} & 107,11 & 4070,68 & 6747,79 \\ \hline
+\multicolumn{1}{|c|}{IP2LB-10} & 107,25 & 4070,73 & 6747,86 \\ \hline
+\multicolumn{1}{|c|}{IP2LRB-10} & 107,19 & 4070,71 & 6747,76 \\ \hline
+\multicolumn{1}{|c|}{ICAN} & 603,76 & 10833,27 & - \\ \hline
+\multicolumn{1}{|c|}{ICPAN} & 362,59 & 9807,05 & - \\ \hline
+\multicolumn{1}{|c|}{BEVA} & 215,91 & 5962,14 & 19232,93 \\ \hline
+\multicolumn{1}{|c|}{META} & 262,31 & 7481,40 & - \\ \hline
+\end{tabular}
+\caption{}
+\label{tab:baselines-memory-consumption}
+\end{table}
