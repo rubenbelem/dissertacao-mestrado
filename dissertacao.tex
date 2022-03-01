@@ -103,6 +103,12 @@
 \usepackage[noend]{algpseudocode}% http://ctan.org/pkg/algorithmicx
 \usepackage{lmodern}% http://ctan.org/pkg/lmodern
 \bibliographystyle{humannat}
+\usepackage{afterpage}
+\newcommand\blankpage{%
+    \null
+    \thispagestyle{empty}%
+    \addtocounter{page}{-1}%
+    \newpage}
 % \bibliographystyle{sbc-template}
 
 % --- 
@@ -215,7 +221,8 @@
 % (o * indica que haverá a ficha bibliográfica)
 % ---
 
-\imprimirfolhaderosto* 
+\imprimirfolhaderosto*
+
 
 % ---
 
@@ -356,26 +363,40 @@
 % ---
 % Dedicatória
 % ---
-% \begin{dedicatoria}
-%    \vspace*{\fill}
-%    \centering
-%    \noindent
-%    \textit{ Este trabalho é dedicado às crianças adultas que,\\
-%    quando pequenas, sonharam em se tornar cientistas.} \vspace*{\fill}
-% \end{dedicatoria}
+\begin{dedicatoria}
+    \vspace*{\fill}
+    \centering
+    \noindent
+    \textit{ Dedico este trabalho aos meus pais, que em muitas vezes acreditaram mais em mim do que eu mesmo. À minha esposa, que esteve comigo nos dias de luta e nos dias de glória. À minha família, amigos e colegas que contribuíram de qualquer forma para que este trabalho pudesse ser elaborado.} \vspace*{\fill}
+\end{dedicatoria}
+\afterpage{\blankpage}
 % ---
 
 % ---
 % Agradecimentos
 % ---
 \begin{agradecimentos}
-Os agradecimentos principais são direcionados à Gerald Weber, Miguel Frasson,
-Leslie H. Watter, Bruno Parente Lima, Flávio de Vasconcellos Corrêa, Otavio Real
-Salvador, Renato Machnievscz e todos aqueles que
-contribuíram para que a produção de trabalhos acadêmicos conforme
-as normas ABNT com \LaTeX\ fosse possível.
 
-Agradecimentos especiais são direcionados ao Centro de Pesquisa em Arquitetura da Informação da Universidade de Brasília (CPAI), ao grupo de usuários \emph{latex-br} e aos novos voluntários do grupo que contribuíram e que ainda contribuirão para a evolução do \abnTeX.
+A Deus, em primeiro lugar, que me capacitou a completar este trabalho, preservou a minha saúde, e me forneceu todos os recursos materiais e intelectuais necessários para isso.
+
+Ao meu pai, M.Sc. Ruan Josemberg Silva Belém, que ouviu minhas dificuldades e me aconselhou, alegrou-se comigo a cada avanço, e não se resguardou de ter conversas difíceis porém necessárias para que eu pudesse terminar este trabalho. 
+
+À minha mãe, Vanusa Silva Belém, por levar muito peso sobre suas costas para que eu pudesse me concentrar no desenvolvimento deste trabalho.
+
+À minha esposa, Keren Rosa Belém, por todo o apoio, por orar muito por mim, ouvir meus desabafos, confortar-me nos momentos de ansiedade e preocupação, por cuidar de mim e dividir responsabilidades para que eu pudesse focar neste trabalho. 
+
+Ao meu orientador, professor Edleno Silva de Moura pela oportunidade de realizar este trabalho, e por muitas vezes me desafiar, fazendo-me ter contato com capacidades que eu não imaginava possuir. Antes mesmo de entrar para a graduação já conhecia alguns de seus feitos e já o admirava. Sinto-me honrado por essa orientação.
+
+Ao Programa de Pós-Graduação de Informática e todos os professores que participaram da minha jornada. Meu profundo agradecimento.
+
+Ao ICOMP, por prover tudo que precisei para desenvolver minhas pesquisas.
+
+Aos parceiros Daniel Xavier e Berg Ferreira do grupo de pesquisa BDRI, por todo o conhecimento compartilhado. O apoio de vocês foi muito importante para mim.
+
+Ao meu amigo Rodrigo Acioli que por muitas vezes ouviu meus desabafos e nunca deixou de me encorajar a seguir em frente, e também aos meus amigos da faculdade Timóteo Fonseca, Ivo Machado, Gabriel Pereira, Ruan Barros, e Juliana Castro, pois eles tiveram grande contribuição para que eu fizesse uma ótima graduação.
+
+Ao meu saudoso amigo Caio Pinheiro, que tinha planos de entrar novamente para o programa de Mestrado, mas antes que o conseguisse veio a falecer durante o período de desenvolvimento deste trabalho. Muito obrigado pelo incentivo, pelos conselhos, pela amizade! Dedico este trabalho também a você.
+
 \end{agradecimentos}
 
 % ---
@@ -386,11 +407,11 @@ Agradecimentos especiais são direcionados ao Centro de Pesquisa em Arquitetura 
 \begin{epigrafe}
     \vspace*{\fill}
 	\begin{flushright}
-		\textit{``Não vos amoldeis às estruturas deste mundo, \\
-		mas transformai-vos pela renovação da mente, \\
-		a fim de distinguir qual é a vontade de Deus: \\
-		o que é bom, o que Lhe é agradável, o que é perfeito.\\
-		(Bíblia Sagrada, Romanos 12, 2)}
+		\textit{
+		Lembre da minha ordem: ``Seja forte e corajoso!
+		\\ Não fique desanimado, nem tenha medo, porque eu, o Senhor, seu Deus,
+		\\ estarei com você em  qualquer lugar para onde você for!''
+		\\ (Bíblia Sagrada, Josué 1:9)}
 	\end{flushright}
 \end{epigrafe}
 \newpage
@@ -539,52 +560,33 @@ We have experimented with three versions of the two-level structure, with each o
 % ----------------------------------------------------------
 % Introdução
 % ----------------------------------------------------------
-\include{chapters/indroducao}
-\newpage
-\thispagestyle{empty}
-\mbox{}
-\newpage
+\input{chapters/indroducao.tex}
 
 % ---------------------
 % Trabalhos relacionados
 % ---------------------
-\include{chapters/trabalhos_relacionados}
-\newpage
-\thispagestyle{empty}
-\mbox{}
-\newpage
+\input{chapters/trabalhos_relacionados}
 
 % ---------------------
 % Referencial Teórico
 % ---------------------
-\include{chapters/referencial_teorico}
-\newpage
-\thispagestyle{empty}
-\mbox{}
-\newpage
+\input{chapters/referencial_teorico}
+\afterpage{\blankpage}
 
 % ---------------------
 % Método Proposto
 % ---------------------
-\include{chapters/metodo}
-\newpage
-\thispagestyle{empty}
-\mbox{}
-\newpage
+\input{chapters/metodo}
+\afterpage{\blankpage}
 
 % ---------------------
 % Resultados
 % ---------------------
-\include{chapters/resultados}
-\newpage
-\thispagestyle{empty}
-\mbox{}
-\newpage
-
+\input{chapters/resultados}
 % ---------------------
 % Conclusão
 % ---------------------
-\include{chapters/conclusao}
+\input{chapters/conclusao}
 
 
 
@@ -597,7 +599,7 @@ We have experimented with three versions of the two-level structure, with each o
 % % ----------------------------------------------------------
 % % Referências bibliográficas
 % % ----------------------------------------------------------
-\newpage
+
  \bibliography{referencias}
 
 % ----------------------------------------------------------
