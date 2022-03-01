@@ -1,9 +1,9 @@
 % ----------------------------------------------------------
 % Introdução
 % ----------------------------------------------------------
-% \section*[Introdução]{Introdução}
+% \chapter*[Introdução]{Introdução}
 \cleardoublepage
-\section{Introdução}
+\chapter{Introdução}
 % \addcontentsline{toc}{chapter}{Introdução}
 
  A forma tradicional de utilizar sistemas de busca é realizar consultas por meio de palavras-chave a partir das quais o sistema responde com dados potencialmente relevantes para o usuário. Se o usuário não sabe exatamente como expressar a sua consulta, ele pode precisar refiná-la e aprimorá-la por meio de ``tentativa e erro'' até que encontre a informação que se está buscando, o que pode  tornar o processo demorado e sujeito a erros. A complementação automática de consultas é um mecanismo que pode auxiliar usuários na tarefa de busca que tem sido amplamente adotado atualmente. Essa funcionalidade consiste em, a partir de um prefixo já digitado pelo usuário, tentar ``advinhar'' a consulta final que será digitada \citep{santo2015}. Com isso, não é necessário escrever toda a consulta, o que além de poupar tempo, pode ajudar a formular uma consulta mais precisa.
@@ -56,7 +56,7 @@ No segundo nível, verificamos que em alguns casos é possível realizar uma bus
 
 Além disso, é possível suavizar essa restrição, de forma que o método deixa de trazer alguns resultados e passa a trazer outros que não deveriam ser considerados, mas agora possibilitando que a otimização seja aplicada em cerca de $85\%\sim90\%$ dos casos, o que pode deixar o tempo de processamento até duas vezes mais rápido, como demonstrado em alguns dos nossos experimentos. Considerando essa suavização, podemos levantar estes questionamentos: ``Em um sistema de busca real, qual é o impacto que o nosso método com a restrição suavizada pode causar na experiência final do usuário?''; ``O quanto essa ausência ou acréscimo de algumas sugestões de consultas atrapalha a navegabilidade o usuário?''; Na Seção~\ref{sec:results} realizamos um experimento com uma base de sugestões de consultas e de prefixos consultados proveniente de um sistema real que implementa a complementação automática de consultas tolerante a erros, com o objetivo de explorar essas perguntas pertinentes.
 
-\subsection{Problema de Pesquisa}
+\section{Problema de Pesquisa}
 \label{sec:research-problem}
 A principal hipótese estudada nesta dissertação é a de que é possível implementar um sistema de complementação automática em dois níveis combinando busca sequencial e busca binária no segundo nível, de forma que a eficiência do processamento aumente e que a acurácia dos resultados não seja prejudicada. As propostas apresentadas por Costa Xavier e Gama Ferreira indicam que a busca em dois níveis é uma abordagem promissora para sistemas de complementação automática. Ao iniciar esta pesquisa, tivemos a ideia de combinar busca binária com sequencial no segundo nível. Apesar de parecer uma ideia simples a princípio, sua implementação trouxe consigo desafios que são apresentados ao longo do trabalho. Nossa pesquisa teve como objetivo responder às seguintes questões de pesquisa: i) É possível adaptar sistemas de busca em dois níveis para tirarem proveito da busca binária no segundo nível? ii) Quais são as adaptações necessárias e limitações de uso da ideia? iii) Há vantagens práticas na combinação de busca binária e busca sequencial no segundo nível?
 

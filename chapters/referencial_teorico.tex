@@ -1,4 +1,4 @@
-\section{Referencial Teórico}\label{sec:ref_teorico}
+\chapter{Referencial Teórico}\label{sec:ref_teorico}
 
 O problema de casamento de padrão consiste em buscar as ocorrências de uma dada cadeia de caracteres $p$ em um texto $t$. Nele há uma janela, na qual o padrão é buscado, que possui o mesmo tamanho do padrão e é movida da esquerda para a direita pelo texto.
 
@@ -21,17 +21,17 @@ Já o problema de casamento aproximado de padrão é definido como encontrar tod
 Esse problema é encontrado em  várias aplicações práticas,  por exemplo em buscas por sequências de DNA, ou para prover sugestões de correções de erros de digitação cometidos pelos usuários ao realizarem consultas em sistemas de busca.
 
 \newpage
-\subsection{Problema da Complementação Automática de Consultas Tolerante a Erros}
+\section{Problema da Complementação Automática de Consultas Tolerante a Erros}
 
 O problema de complementação automática de consultas tolerante a erros pode ser visto como uma versão especializada do problema de casamento de padrão. Seja \textit{p} uma cadeia de caracteres que representa uma consulta de prefixo já digitada pelo usuário, um conjunto de cadeias de caracteres \textit{S} que representa a base de consultas e $\tau$ um limite máximo de distância de edição tolerado. O problema consiste em encontrar todos os elementos de \textit{S} que correspondem à \textit{p} com no máximo $\tau$ erros.
 
 Um elemento $s$ qualquer do conjunto $S$ possui vários prefixos. Se $s = ``sapato"$, seus possíveis prefixos são \textit{\{``s'', ``sa'', ``sap'', ``sapa'', ``sapat'', ``sapato''\}}. Se qualquer um deles puder ser transformado em $p$ com um número de operações menor ou igual à $\tau$, então $s$ corresponde à $p$ com no máximo $\tau$ erros, e fará parte da resposta do problema. A solução para o problema deve atender a uma restrição de computar os resultados em um tempo menor que a velocidade média de digitação de um usuário comum, a qual é aproximadamente $100ms$ \citep{ji2009efficient}.
 
-\subsection{Opções de Solução para o Problema de CATE}
+\section{Opções de Solução para o Problema de CATE}
 
 As soluções para o problema de casamento de padrão podem ser divididas em dois grupos. O primeiro engloba abordagens baseadas em busca sequencial por toda a base de consultas. O segundo grupo consiste em abordagens que criam índices a partir da base de consultas em um momento anterior ao processamento de requisições. 
 
-\subsubsection{Busca Sequencial}
+\subsection{Busca Sequencial}
 \label{sec:sequential_search}
 
 Os algoritmos de busca sequencial que não utilizam índices consistem em percorrer todos os itens da base de consultas, e comparar o prefixo de consulta com cada item, para determinar quais consultas devem fazer parte da resposta. No contexto de CATE, essa comparação consiste em verificar se o prefixo consultado pode ser transformado em algum dos possíveis prefixos da consulta com no máximo $\tau$ operações. Descreveremos a seguir uma solução de busca sequencial baseada em um algoritmo de programação dinâmica proposto por \cite{levenshtein1966binary}. 
@@ -78,13 +78,13 @@ Seja $\mc{S}$ um conjunto de sugestões de consulta, $p$ um prefixo de consulta 
 Existem algoritmos de busca sequencial mais eficientes em comparação ao que foi apresentado acima, mas o mesmo é importante pois fornece uma base de entendimento para os outros algoritmos mais complexos que estudaremos aqui. 
 % No entanto, mesmo as soluções mais eficientes com essa abordagem podem facilmente atingir um alto consumo de memória quando a base é muito grande. Portanto, essas soluções não são aceitáveis em alguns dos cenários de complementação de consultas.
 
-\subsubsection{Busca com Utilização de Índices}
+\subsection{Busca com Utilização de Índices}
 
 Os métodos baseados em índices utilizam estruturas de dados especiais para diminuir o tempo de processamento das consultas. Há diversas alternativas de estruturas de índices especializadas para o problema de CATE, como por exemplo índices invertidos \citep{baezayates99}, árvores de sufixo, ou árvores \textit{Trie}. Dentre essas estruturas, a mais adotada dentre os algoritmos mais recentes da literatura é a árvore \textit{Trie} \citep{chaudhuri2009extending,ji2009efficient,li2011efficient, xiao2013efficient,deng2016meta, zhou2016beva}.
 
 Mesmo que a solução de busca sequencial não seja viável, Costa Xavier e Gama Ferreira \citep{xavier2019, berg2020} estudaram a possibilidade de combiná-la com métodos baseados em índices, visando obter soluções que economizem memória enquanto mantêm uma boa velocidade de processamento das consultas. Essa abordagem é chamada ``busca em dois níveis'', e utiliza índices para reduzir o espaço de busca e então realiza uma busca sequencial nesse espaço reduzido.
 
-\subsection{Trie}
+\section{Trie}
 \label{sec:trie}
 
 A estrutura de dados \textit{Trie} ou ``árvore digital'' é uma árvore que armazena um conjunto de palavras e são capazes de recuperar qualquer termo indexado em um tempo proporcional ao seu comprimento, independentemente do tamanho e quantidade total das palavras armazenadas. Os caracteres das palavras armazenadas nessa estrutura pertencem a um alfabeto predefinido $\Sigma$, e cada nó da árvore contém um caractere armazenado como chave. A estrutura começa com o nó raiz que representa uma palavra vazia $\epsilon$ (palavra com $0$ caracteres). Cada nó possui um conjunto de nós filhos com tamanho menor ou igual a $|\Sigma|$, sendo $|\Sigma|$ o tamanho do alfabeto. Para cada nó da árvore é possível caminhar do nó raiz até o mesmo e computar um prefixo, concatenando os caracteres dos nós presentes nesse caminho. Objetivando a simplicidade, iremos nos referir aos nós pelo seu prefixo correspondente de forma intercambiável.
@@ -104,7 +104,7 @@ Além da busca exata por palavras na \textit{Trie}, também é possível realiza
 
 Os prefixos da \textit{Trie} que se encontram dentro do limiar $\tau$ de tolerância de erros são chamados de ``nós ativos'', e a busca aproximada é realizada de forma incremental a partir dos nós ativos do prefixo de consulta anterior. A Figura~\ref{fig:exact_and_approximate_search_trie} contém apenas uma exemplificação de apenas alguns nós que podem ser ativos durante o processamento incremental do prefixo de consulta ``capa'', mas não todos. A forma completa de processamento dos nós ativos será mais detalhada a seguir.
 
-\subsubsection{Nós Ativos}
+\subsection{Nós Ativos}
 \label{sec:active_nodes}
 
 \begin{figure}[ht]
@@ -118,11 +118,11 @@ Um nó é considerado ativo quando a distância de edição entre seu prefixo e 
 
 A Figura~\ref{fig:active_nodes_example} demonstra um exemplo de ativação de nós do índice \textit{Trie} à medida que o processamento do prefixo de consulta ``capa'' vai ocorrendo. O limiar de erros tolerados é $\tau = 1$. No início do processamento, considera-se o termo consultado como sendo uma cadeia de caracteres vazia, cujo valor é representado por $\epsilon$. A partir disso, é necessário ativar todos os nós (prefixos) da \textit{Trie} cujos prefixos possam ser transformados no prefixo de consulta, o qual é $\epsilon$ inicialmente. Portanto, os prefixos $\epsilon$ (representado pelo nó raiz da \textit{Trie}) e ``c'' são considerados nós ativos, pois $ed(\epsilon, \epsilon) = 0$ (círculo tracejado) e $ed(``l", \epsilon) = 1$ (círculo de borda grossa). Após isso, o prefixo consultado passa a ser primeira letra de ``capa'', ``c''. Então, é necessário analisar os nós já ativos (e seus respectivos filhos) do prefixo consultado anteriormente para computar os novos nós ativos para ``c''. A análise de cada nó ativo termina quando se encontra um prefixo fora do limiar $\tau$. Os novos nós ativos computados são $\epsilon$, ``c'' e ``ca'', porque $ed(\epsilon, ``c"") = 1$, $ed(``c", ``c"") = 0$ e $ed(``ca", ``c"") = 1$. Todos os outros prefixos além desse possuem distância de edição maior que o limite $\tau = 1$, portanto não são considerados nós ativos. Quando o prefixo de consulta passa a ser ``ca'', o nó raiz já não é mais um nó ativo, pois $ed(\epsilon, ``ca") = 2$, o nó ``c'' continua como nó ativo porém agora com uma distância igual a $1$ em relação a ``ca'', e dois novos nós são ativos, sendo eles  ``cas'' e ``cap'', ambos com distância igual a $1$ também. Esse algoritmo é repetido até chegar no final do prefixo de consulta ``capa'', cujos nós ativos são ``casa'' e ``capa''. O objetivo de computar nós ativos é o de utilizá-los para identificar itens similares ao prefixo consultado.
 
-\subsection{ICAN}
+\section{ICAN}
 
 O algoritmo proposto por \cite{ji2009efficient} denomina-se ``Computando Nós Ativos Incrementalmente'' (\textit{Incrementally Computing Active Nodes } -- ICAN). Considerando uma consulta de prefixo $p$ com apenas uma palavra-chave, para processar os nós ativos de forma eficiente é necessário computar e armazenar um conjunto de tuplas $\Phi_{p} = \{ \langle n, \xi_{n} \rangle \}$ tal que (1) cada $n$ é um nó ativo em relação à $p$ com $\xi_{n} = ed(n, p) \leq \tau)$ e (2) quaisquer nós ativos de $p$ estão presentes em $\Phi_{p}$, que é o \textit{conjunto de nós ativos de p} \citep{ji2009efficient}. Quando o usuário digita mais um caractere $p + 1$ após ter digitado $p$, o conjunto $\Phi_{p}$ de nós ativos de $p$ pode ser usado para computar o conjunto $\Phi_{p + 1}$ de nós ativos da nova consulta.
 
-\subsubsection{Descrição do Algoritmo}
+\subsection{Descrição do Algoritmo}
 
 \begin{figure}[ht]
     \centering
@@ -152,12 +152,12 @@ Suponhamos que após o usuário digitar o prefixo de consulta $p_{x} = c_{1}c_{2
 
 Para manter apenas as distâncias de edição mínimas no conjunto de nós ativos, durante a computação de $\Phi_{p_{x+1}}$, toda vez que se deseja adicionar uma tupla $\langle v, \xi_{1} \rangle$ ao conjunto é possível que o mesmo já contenha a tupla $\langle v, \xi_{2} \rangle$ para o mesmo nó $v$ no conjunto. Então, se $\xi_{1} \geq \xi_{2}$ a nova tupla não é adicionada. Se $\xi_{1} < \xi_{2}$, então a nova tupla substitui a original no conjunto. Ou seja, para um mesmo nó $v$ da \textit{Trie} no novo conjunto mantém-se apenas a sua menor distância de transformação para o prefixo de consulta $p_{x+1}$.
 
-\subsection{ICPAN}
+\section{ICPAN}
 
 De acordo com o que foi dito na seção~\ref{sec:active_nodes}, o principal propósito de computar os nós ativos é usá-los para identificar itens similares ao prefixo consultado. Considerando o algoritmo ICAN, o conjunto de nós ativos final para o prefixo de consulta pode acabar sendo muito grande, o que aumenta o tempo de processamento. Diante desse problema \cite{li2011efficient} propuseram uma melhoria no algoritmo que consiste em podar nós ativos desnecessários, mas ainda mantendo a possibilidade de computar as respostas à consulta. As principais vantagens desse método são a redução do espaço de memória necessário para armazenar o conjunto de nós ativos, e também a redução do tempo de processamento da consulta, pois não é necessário examinar todos os nós ativos. 
 Segue um exemplo de poda que reflete a intuição por trás desse método. Ainda considerando o exemplo da Figura~\ref{fig:incrementally_computing_active_node_set}, seja ``nl'' prefixo consultado com um limiar $\tau = 2$, onde $\Phi_{nl} = \{ \langle n_{12}, 1\rangle, \langle n_{0}, 2\rangle,  \langle n_{13}, 2\rangle,  \langle n_{19}, 2\rangle \}$. No entanto, apesar de $n_{13}$ (``li'') e $n_{19}$ (``lu'') serem nós ativos, não é necessário mantê-los, pois é possível utilizar o nó ativo $n_{12}$ (``l'') para computar as palavras ``li'' e ``lu''. Ou seja, é necessário manter apenas o nó ativo ``l'' para computar o mesmo conjunto de itens similares ao prefixo ``nl'' consultado.
 
-\subsubsection{Nós Pivô Ativos}
+\subsection{Nós Pivô Ativos}
 \label{sec:pivotal_active_nodes}
 
 Seja $n$ um nó ativo de $p$. Se para qualquer transformação de $n$ para $p$ com $ed(n,p)$ operações a operação no último caractere de $n$ não for uma correspondência (caracteres iguais), e for possível deletar o último caractere de $n$, o nó $n$ não é mantido, e sim o seu nó pai. Assim, surge o conceito de \textit{nó pivô ativo} \citep{li2011efficient}.
@@ -166,7 +166,7 @@ Considerando novamente o prefixo ``nl'' no exemplo da Figura~\ref{fig:incrementa
 
 Para computar de forma eficiente os nós pivô ativos, \cite{li2011efficient} desenvolveram o algortimo ``Computando Nós Pivô Ativos Incrementalmente'' (\textit{Incrementally Computing Pivotal Active Nodes } -- ICPAN). Sendo $p_{x}$ um prefixo de consulta, o objetivo é computar e armazenar um conjunto de 4-uplas $\Psi_{p_{x}} = \{ \langle n, \xi_{n}^{p_{x}}, p_{i}, \xi_{n}^{p_{i}} \rangle \}$. Em cada 4-upla do conjunto, $n$ é um nó pivô ativo de $p_{x}$, e \textit{$p_{i}$ é um prefixo de $p_{x}$ cujos últimos caracteres são iguais aos últimos caracteres de $n$}. Se esse prefixo não existir, então $p_{i} = \epsilon$. Se houver mais de uma possibilidade para $p_{i}$, então seleciona-se aquele com o menor número de caracteres. O quarto elemento da tupla, $\xi_{n}^{p_{i}} \leq \tau$ é a distância de dição entre o nó $n$ e o prefixo $p_{i}$ com operações de correspondência entre os últimos caracteres de $n$ e $p_{i}$. Já o segundo elemento da tupla, $\xi_{n}^{p_{x}} \leq \tau$ é a distância de edição entre nó $n$ e o prefixo de consulta $p_{x}$, obtida transformando primeiro $n$ em $p_{i}$, e então inserindo os caracteres restantes da diferença entre $p_{x}$ e $p_{i}$. A partir disso, deriva-se a igualdade $\xi_{n}^{p_{x}}=\xi_{n}^{p_{i}} + |p_{x}|-|p_{i}|$.
 
-\subsubsection{Descrição do Algoritmo}
+\subsection{Descrição do Algoritmo}
 \label{sec:icpan_algorithm_description}
 
 Antes do usuário digitar qualquer caractere, o prefixo de consulta é considerado uma cadeia vazia $\epsilon$, e então seu conjunto de nós pivô ativos correspondente é inicializado como $\Psi_{\epsilon} = \{ \langle r, 0, \epsilon, 0 \rangle \}$, onde $r$ é o nó raiz, já que a raiz é o único nó pivô ativo para $\epsilon$ de acordo com as definições estabelecidas anteriormente. Considerando ainda o mesmo exemplo da Figura~\ref{fig:incrementally_computing_active_node_set}, no qual o usuário digita o prefixo de consulta ``nlis'' caractere a caractere, e o limiar de distância de edição é $\tau = 2$, o primeiro passo é inicializar o conjunto como $\Psi_{\epsilon} = \{ \langle n_{0}, 0, \epsilon, 0 \rangle \}$, sendo $n_{0}$ o nó raiz. 
@@ -190,11 +190,11 @@ O ICPAN possui uma situação a mais para tratar em comparação ao ICAN: a remo
 
 Tanto o ICAN quanto o ICPAN produzem no final do processamento um conjunto de nós ativos. Os dois algoritmos consideram que cada nó folha $n_{folha}$ da árvore \textit{Trie} possui uma lista invertida $L$ de ``\textit{IDs}'' dos itens que possuem o prefixo referente ao nó $n_{folha}$. Então, para cada nó ativo do conjunto final obtido, obtem-se todos os nós folhas dentre seus descendentes. \textit{A lista de \textit{IDs} resultante das interseções entre as listas de todos esses nós folhas obtidos é a lista de itens similares ao prefixo consultado, ou seja, a resposta para o problema de CATE}.
 
-\subsection{Busca em dois níveis}
+\section{Busca em dois níveis}
 
 Uma possível estratégia de busca em dois níveis para o problema de CATE consiste indexar somente parte dos itens da base de dados em uma árvore \textit{Trie}, e combinar um algoritmo de busca aproximada para essa estrutura (primeiro nível) com o algoritmo de busca sequencial apresentado na seção~\ref{sec:sequential_search} (segundo nível). Para isso, o prefixo de consulta também precisa ser divido em duas partes que são processadas por cada nível. Nessa abordagem, uma vez que os itens são indexados apenas parcialmente, o conjunto de nós ativos obtidos no final da execução do algoritmo do primeiro nível recebe uma nova função. Normalmente, tal conjunto é utilizado para computar os itens similares ao prefixo consultado, mas nessa abordagem de dois níveis, passa a ser usado como filtro para a busca sequencial do segundo nível, que é realizada somente nos itens referenciados por esses nós ativos.
  
-\subsection{Busca binária com elementos repetidos na coleção}
+\section{Busca binária com elementos repetidos na coleção}
 \label{sec:binary_search_with_duplicates}
 
 Considerando a abordagem em dois níveis, neste trabalho analisamos a hipótese de que é possível utilizar não somente busca sequencial no segundo nível, mas também busca binária em alguns casos especiais, que são nós ativos com uma determinada característica explicada com mais detalhes na sessão~\ref{sec:metodo}. Nesses casos, é necessário realizar buscas binárias nas listas invertidas dos nós folha descendentes dos nós ativos.

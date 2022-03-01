@@ -1,12 +1,12 @@
-\section{Resultados}
+\chapter{Resultados}
 \label{sec:results}
 
 Nesse capítulo nós apresentamos os resultados do estudo de parâmetros dos métodos propostos, suas vantagens e desvantagens e também os cenários onde podem ser melhor aplicados. Além disso, também comparamos os métodos propostos com alguns \textit{baselines} (métodos de linha de base). A partir dos experimentos espera-se responder as seguintes perguntas: i) É possível adaptar sistemas de busca em dois níveis para tirarem proveito da busca binária no segundo nível? ii) Quais são as adaptações necessárias e limitações de uso da ideia? iii) Há vantagens práticas na combinação de busca binária e busca sequencial no segundo nível?
 
-\subsection{Configuração dos experimentos}
+\section{Configuração dos experimentos}
 \label{sec:experiments-setup}
 
-\subsubsection{Métodos experimentados}
+\subsection{Métodos experimentados}
 Nos experimentos são analisados os seguintes algoritmos:
 \begin{itemize}
     \item \textbf{ICAN} -- Um método baseado na computação incremental de nós ativos. \citep{ji2009efficient}
@@ -20,7 +20,7 @@ Nos experimentos são analisados os seguintes algoritmos:
 
 As implementações dos métodos ICAN, ICPAN e META foram retiradas de um repositório\footnote{\url{https://github.com/TsinghuaDatabaseGroup/Autocompletion/tree/master/threshold}} do \textit{GitHub}. Esta pesquisa produziu contribuições quanto a esse repositório: (1) correção de um \textit{memory leak} no código dos arquivos ``\textit{main}'' dos métodos ICAN e ICPAN; (2) A inicialização do conjunto de nós ativos do método ICAN estava incompleta, e foi corrigida levando em consideração a descrição de inicialização presente no artigo original; (3) Correção de funcionamento do método ICPAN. Uma parte do fluxo do código de expansão do conjunto de nós pivô ativos estava com um cálculo errôneo para o limite de profundidade que seria analisada a partir de um nó pivô ativo. No código do repositório a expressão para definir esse limite é $\tau - \xi_{n}^{p_{x+1}} + 1$, quando na verdade deveria ser $\tau - \xi_{n}^{p_{i}} + 1$ como explicado anteriormente na seção~\ref{sec:icpan_algorithm_description}. 
 
-\subsubsection{Ambiente de experimentação e Bases de Dados}
+\subsection{Ambiente de experimentação e Bases de Dados}
 
 Os métodos propostos na seção~\ref{sec:metodo} foram implementados na linguagem \textit{C++} visando obter um melhor desempenho, e também possibilitar uma comparação mais fidedigna com os \textit{baselines}, os quais também foram todos implementados em \textit{C++}. Todos os códigos-fonte dos \textit{baselines} são os originais utilizados pelos autores de seus respectivos artigos, com exceção do método BEVA, cuja implementação é própria e foi realizada no trabalho de \cite{berg2020}.
 
@@ -62,7 +62,7 @@ prefixos de consulta & 1.000 & 2.845 & 6,1364 & 18,6230 \\ \hline
 \label{tab:jusbrasil-dataset}
 \end{table}
 
-\subsection{Impactos da busca binária na acurácia dos métodos em dois níveis}
+\section{Impactos da busca binária na acurácia dos métodos em dois níveis}
 \label{sec:binary-search-impact-on-two-level}
 
 Como demonstrado na seção~\ref{sec:IP2LRB}, os métodos IP2LB e IP2LRB ora deixam de recuperar sugestões que deveriam fazer parte da resposta, e ora recuperam sugestões que não deveriam ser sugeridas. Portanto, faz-se necessário analisar o quão impactante é esse comportamento em comparação com um método que traz todas as respostas corretas, como o BEVA, por exemplo, pois seria irrelevante sacrificar a capacidade de obter um conjunto de sugestões minimamente aceitável em troca de uma menor velocidade de processamento (devido à busca binária). 
@@ -84,7 +84,7 @@ Para realizar tal análise, fizemos uma adaptação das métricas \textit{precis
 A Tabela~\ref{tab:confusion-matrix-f1-score} contém o teste de hipóteses considerando esse comparativo com o método BEVA. Considera-se ``verdadeiro positivo (vp)'' quando a sugestão foi sugerida tanto pelo método analisado quanto pelo BEVA. Se foi sugerida pelo método mas não pelo BEVA, então é um caso de ``falso positivo (fp)''. Uma sugestão que foi sugerida pelo BEVA mas não pelo método representa um ``falso negativo (fn)''. As sugestões não sugeridas nem pelo método e nem pelo BEVA representam o ``verdadeiro negativo (vn)''. Essas definições são utilizadas no cálculo da métrica \textit{F1-Score}, descrita a seguir.
 
 
-\subsubsection{A métrica \textit{F1-Score}}
+\subsection{A métrica \textit{F1-Score}}
 
 As duas métricas mais frequentes e básicas para a eficácia de um sistema de recuperação de informação são a \textit{precisão} e a \textit{revocação}  \citep{irbookchristopher}. Seus valores variam entre $0$ e $1$, mas são comumente representadas em forma de porcentagem.
 
@@ -109,7 +109,7 @@ Há uma variação dessa métrica na qual a média harmônica é ponderada, send
 
 A média harmônica é utilizada no lugar da média aritmética pois sempre é possível obter $100\%$ de revocação ao simplesmente fazer o método sugerir todas as sugestões da base, e portanto é possível obter uma média aritmética de $50\%$ a partir desse mesmo processo, enquanto o mesmo não acontece com a média harmônica. Isso sugere que a média aritmética não é adequada para esse caso \citep{irbookchristopher}.
 
-\subsubsection{Experimentos com a base de dados da Jusbrasil}
+\subsection{Experimentos com a base de dados da Jusbrasil}
 
 Para averiguar os impactos da utilização da busca binária na acurácia dos métodos propostos realizamos experimentos na base JUSBRASIL, a qual foi extraída de um sistema real de complementação automática de consultas. Esse experimento foi realizado visando responder as questões de pesquisa i) e iii) levantadas na seção~\ref{sec:research-problem}. Em um sistema de dois níveis para CATE normalmente espera-se que todas as sugestões aproximadas dentro do limite $\tau$ sejam retornadas. No entanto, se o ao utilizar busca binária no segundo nível o modelo ainda trouxer grande maioria dos resultados corretos, então utilizar essa técnica pode ser vantajoso.
 
@@ -238,12 +238,12 @@ Considerando o limite de 100ms para tempo de resposta \citep{ji2009efficient}, o
 
 Há espaço para a criação de um modelo que utiliza a estratégia do IP2L para $\tau \leq 2$, onde a acurácia é mais importante, e a do IP2LB para $\tau > 2$ onde mais importa a velocidade de resposta, já que o espaço amostral de sugestões de consultas que devem ser retornadas aumenta bastante. A diferença de \textit{F1-Score} entre o IP2LB e IP2LRB para $\tau=3$ foi inexpressiva, portanto faz sentido utilizar o IP2LB nesse possível novo modelo por conta de seu menor tempo de processamento. Nesse caso, seria possível atingir a marca de 100ms para $\tau \leq 3$ em bases um pouco menores do que a JUSBRASIL. Por fim, a questão de pesquisa i) pode ser empiricamente respondida pelos experimentos realizados, os quais demonstram que não é possível adaptar sistemas de busca em dois níveis para tirarem proveito da busca binária no segundo nível sem que haja algum impacto na acurácia do método.
 
-\subsection{Avaliando os parâmetros dos métodos propostos}
+\section{Avaliando os parâmetros dos métodos propostos}
 
 Nessa seção iremos realizar a seleção do parâmetro $\lambda$ para os métodos IP2L, IP2LB e IP2LRB propostos na seção~\ref{sec:metodo}, com valores variando de $5$ a $10$. Não analisamos valores abaixo de $5$ pois o processamento da consulta ficaria custoso demais devido à frequente ativação do segundo nível. Semelhantemente, também não analisamos valores acima de $10$ pois grande parte do processamento da consulta ocorreria no primeiro nível. O objetivo dessa seção é estudar os efeitos de diferentes valores de $\lambda$ nos três métodos e escolher o melhor valor para os métodos considerando a acurácia, o tempo de processamento das consultas, e também consumo de memória.
 
 
-\subsubsection{Tempo de processamento de prefixos de consulta}
+\subsection{Tempo de processamento de prefixos de consulta}
 \label{sec:methods-processing-time}
 
 O tempo de processamento das consultas é uma métrica muito importante para avaliar sistemas de CATE. Essa métrica permite distinguir os algoritmos lentos dos rápidos para então escolher quais irão proporcionar a melhor experiência para o usuário, evitando atrasos notáveis e exibindo respostas a cada caractere digitado. Nós medimos o tempo de processamento em cada um dos dois níveis, portanto, o valor da coluna ``total'' nas Tabelas dos experimentos é igual a soma dos valores das colunas ``1º'' e ``2º'' e representa o valor total do tempo de processamento. As Tabelas \ref{tab:methods-processing-time-tau-1-AOL} e  \ref{tab:methods-processing-time-tau-1-USADDR} contêm, considerando uma tolerância de $\tau=1$ erros de digitação, as medições dos tempos de processamento para os variados tamanho de prefixos de consulta. Semelhantemente, as Tabelas \ref{tab:methods-processing-time-tau-2-AOL} e \ref{tab:methods-processing-time-tau-2-USADDR} para $\tau=2$ e as Tabelas \ref{tab:methods-processing-time-tau-3-AOL} e \ref{tab:methods-processing-time-tau-3-USADDR} para $\tau=3$.
@@ -602,7 +602,7 @@ Por fim, na base USADDR o único valor de $\lambda$ para o qual os métodos dese
 
 \newpage
 \newpage
-\subsubsection{Consumo de memória}
+\subsection{Consumo de memória}
 \label{sec:memory_consumption}
 
 Os sistemas de CATE mantêm seus índices e os textos das sugestões armazenados diretamente na memória pois isso possibilita uma maior velocidade de acesso às informações e também responder às consultas por prefixos com mais velocidade. No entanto, é necessário equilibrar bem essa relação entre tempo de processamento e memória, pois ela é um recurso limitado e custoso. Nesse cenário, quanto maior o índice maior é a quantidade de memória utilizada. Por exemplo método IncNG\textit{Trie} \citep{xiao2013efficient}, apesar de ser o mais rápido presente na literatura, consome uma imensa quantidade de memória, o que dificulta utilizá-lo em alguns cenários práticos.
@@ -662,12 +662,12 @@ O contexto e cenário de um sistema de CATE podem influenciar a escolha do valor
 Por fim, selecionamos os modelos IP2L-10, IP2LRB-10 e IP2LB-10 para serem comparados com os métodos de base na seção~\ref{sec:comparison_baseline_methods} a seguir. Dentre os valores de $\lambda$ e $\tau$ experimentados o valor $\lambda=10$ foi o que mais aproximou o tempo de processamento dos métodos do limite de $100ms$ para bases grandes como USADDR e JUSBRASIL. Além disso, mesmo para $\lambda=10$ a economia de memória em relação ao método ICPAN original chega a ser mais de $50\%$ como será demonstrado na próxima seção.
 
 
-\subsection{Comparação com os Métodos de Base}
+\section{Comparação com os Métodos de Base}
 \label{sec:comparison_baseline_methods}
 
 Nesta seção iremos comparar os métodos IP2L-10, IP2LB-10 e IP2LRB-10 com os métodos ICAN, ICPAN, e META (cujos códigos foram providos pelos autores) e também o método BEVA (implementação própria) nas bases AOL e USADDR. Analisaremos as médias de tempo de processamento em dois cenários: (1) variando o limiar $\tau$ de distância de edição para um prefixo de consulta mais curto de tamanho 5, e também mais longo, de tamanho 13; (2) média de tempos de processamento para $\tau=3$, variando o tamanho do prefixo de 3 a 13, de 2 em 2. Por fim, analisaremos também a utilização de memoria.
 
-\subsubsection{Variando o valor do Limiar de Distância de Edição}
+\subsection{Variando o valor do Limiar de Distância de Edição}
 
 As Tabelas \ref{tab:baselines-varying-tau-p-5} e \ref{tab:baselines-varying-tau-p-13} contêm os tempos de processamento para todos os algoritmos variando $\tau$ de 1 a 3, e com os tamanhos de prefixo de consulta fixados em 5 e 13, respectivamente, com o objetivo de analisar o resultados para tamanhos de prefixos de consulta mais pequenos e mais longos. Nesse último cenário o segundo nível pode vir a ter um mal desempenho quando precisa buscar por cadeias de caracteres muito longas, principalmente o IP2L que realiza apenas busca sequencial. Quanto maior é o tamanho da cadeia de caracteres buscada no segundo nível, maior é o tempo de execução do cálculo da matriz de \textit{Levenhstein}. Já que $\lambda$ está fixado em 10, para o tamanho $|p|=13$ o segundo nível é sempre ativado para os valores de $\tau$ experimentados.
 
@@ -718,7 +718,7 @@ Na base USADDR e $\tau=1$, o método IP2L-10 obteve um tempo quase 2 vezes mais 
 Outra situação ocorrida é que o IP2L-10 obteve 117,05\textit{ms} um tempo de processamento menor do que o ICPAN, com 130,38\textit{ms}. E preciso considerar que o IP2L-10 realiza uma busca tolerante a erros no primeiro nível em uma árvore de altura profundidade máxima igual a 10, e então buscar sequencialmente no segundo nível por $p$. Além disso, para valores maiores de $\lambda$, frequentemente o tamanho das listas em que se realiza a busca sequencial e menor quando o segundo nível é ativado. Uma vez que $|p|=13$ e $\tau=3$, o ICPAN precisa realizar a busca tolerante a erros em uma profundidade máxima de $|p| + \tau = 16$ caracteres para responder ao prefixo de consulta $p$. Diferentemente do que ocorreu na base AOL para $\tau=3$, o experimento indica que possivelmente em uma base grande como o USADDR e com uma tolerância maior a erros como $\tau=3$, o processamento de nós com uma maior profundidade na árvore do ICPAN é mais lento do que combinar o processamento desses nós em uma profundidade menor com busca sequencial.
 
 
-\subsubsection{Variando o Tamanho do Prefixo de Consulta}
+\subsection{Variando o Tamanho do Prefixo de Consulta}
 
 As Tabelas \ref{tab:baselines-varying-prefix-size-AOL} e \ref{tab:baselines-varying-prefix-size-USADDR} contêm os tempos de processamento médios para todos os algoritmos com o tamanho do prefixo de consulta variando de $|p|=3$ até $|p|=13$ de 2 em 2 com $\tau=3$ para as bases AOL e USADDR, respectivamente. Consideramos apenas $\tau=3$ seguindo a literatura, pois isso nos permite analisar o processamento das consultas dos métodos com um número relevante de erros de digitação. Valores acima de 3 não são comuns em cenários práticos de CATE.
 
@@ -764,7 +764,7 @@ Na Tabela~\ref{tab:baselines-varying-prefix-size-AOL} para $|p|=3$ vemos novamen
 
 Diferentemente da base AOL, a eficiência do método BEVA fica mais clara em uma base maior como a USADDR. O método BEVA obteve os menores tempos para todos os tamanhos de $|p|$ como podemos observar na Tabela~\ref{tab:baselines-varying-prefix-size-USADDR}. Para $|p|=7$ e $|p|=9$ os métodos de dois níveis foram os únicos além do BEVA a atingir tempos menores do que 100\textit{ms}. O método IP2L-10 por exemplo obteve 77,18\textit{ms} para $|p|=7$, sendo cerca de 1,4 vezes mais rápido do que o ICPAN com 110,71\textit{ms}. No entanto, a partir de $|p|=11$ os métodos IP2L-10 e IP2LRB-10 seguem com tempos maiores do que 100\textit{ms}. É necessário destacar o desempenho do IP2LB-10, que obteve tempos abaixo de 100\textit{ms} para todos os tamanhos de prefixo de consulta a partir de $|p|=7$. Além disso, o método IP2L-10 (que não tem problemas com acurácia) demonstrou médias de tempo menores do que o ICPAN para todos os tamanhos de prefixo de consulta a partir de $|p|=5$, algo que no cenário experimentado pode indicar que a solução em dois níveis se demonstrou mais vantajosa do que o método original utilizado no primeiro nível no quesito tempo de processamento.
 
-\subsubsection{Consumo de memória}
+\subsection{Consumo de memória}
 
 Quando comparamos o consumo de memória, notamos que os métodos propostos apresentam uma vantagem em comparação aos métodos de base. A Tabela~\ref{tab:baselines-memory-consumption} apresenta a quantidade média de memória utilizada pelos métodos propostos e os de base para os 3 valores de $\tau$ experimentados (cada célula contém a média aritmética entre as quantidades de memória medidas para $\tau=1$, $\tau=2$ e $\tau=3$), nas bases AOL, USADDR e JUSBRASIL. Para todas as bases podemos observar que os métodos propostos obtiveram o menor consumo de memória. 
 

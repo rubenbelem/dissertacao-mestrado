@@ -1,4 +1,4 @@
-\section{Conclusão}
+\chapter{Conclusão}
 \label{sec:conclusion}
 
 A complementação automática de consultas tolerante a erros (ou ``CATE'') tem se demonstrado uma funcionalidade importante das aplicações de busca pois auxilia os usuários a encontrar o que procuram. Os métodos mais eficientes para solução do CATE encontrados na literatura utilizam índices de árvore \textit{Trie} em suas soluções, o que pode ocasionar um grande consumo de memória, um recurso limitado e de alto custo. Uma forma de tentar mitigar esse problema é a abordagem de busca em dois níveis, que consiste em dividir o processamento do prefixo de consulta em duas partes. Na primeira parte, realiza-se uma busca tolerante a erros em um índice \textit{Trie} que indexa apenas uma quantidade limitada de $\lambda$ caracteres das sugestões de consulta. Essa busca funciona como um filtro para que restem apenas candidatos de resposta, que serão buscados sequencialmente no segundo nível para serem ou não sugeridos. No entanto, essa busca sequencial realizada no segundo nível pode ser muito custosa e tornar o processamento mais lento. 

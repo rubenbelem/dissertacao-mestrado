@@ -1,4 +1,4 @@
-\section{Trabalhos relacionados}\label{sec:referencias}
+\chapter{Trabalhos relacionados}\label{sec:referencias}
 \label{sec:related_work}
 
 O problema de CATE foi primeiramente estudado por \cite{chaudhuri2009extending} e \cite{ji2009efficient}. Ambos propuseram soluções baseadas em computar de forma incremental um conjunto de nós ativos de uma \textit{Trie}, a qual funciona como índice para a base de consultas que poderão ser sugeridas. A ideia geral comum entre os dois algoritmos é a de que os algoritmos calculam um conjunto de ``nós ativos'' que correspondem a todos os prefixos encontrados na \textit{Trie} similares a cada letra nova de um prefixo de consulta $p$ digitado pelo usuário, dentro de um limite de distância de edição $\tau$. A partir desses prefixos calculados, é possível recuperar o restante do texto das consultas que serão sugeridas na própria árvore.
