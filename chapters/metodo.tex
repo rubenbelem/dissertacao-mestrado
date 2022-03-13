@@ -154,7 +154,7 @@ Na linha 4 define-se o laço de repetição de iteração sobre todas tuplas de 
 \subsection{Computação de Nós Ativos no Primeiro Nível}
 \label{sec:first_level_active_node_set_computation}
 
-% Seja $p$ um prefixo consultado pelo usuário. Considerando que $p[1..\lambda]$ é uma sub-cadeia de caracteres de $p$ que vai do 1º até o $\lambda$-ésimo caractere, e que $p[1..\lambda] = p$ se $|p| \leq \lambda$, nós processamos a subcadeia $p[1..\lambda]$ na linha $3$ com o algoritmo ICPAN caractere a caractere, de acordo com os passos do algoritmo descritos na seção~\ref{sec:second_level}. Após terminar essa etapa obtemos um conjunto $\Psi_{p[1..\lambda]} = \{ \langle n, \xi_{n}^{p[1..\lambda]}, m_{i}, \xi_{n}^{p_{i}} \rangle \}$ de \textit{nós pivô ativos de} $p[1..\lambda]$. Se $|p| \leq \lambda$ consideramos que $p$ é uma consulta ``comum'', e então realizamos o processamento caractere a caractere padrão do ICPAN para obter a resposta na linha $5$. No entanto, quando $|p| > \lambda$, é necessário dividir o processamento em dois níveis.
+% Seja $p$ um prefixo consultado pelo usuário. Considerando que $p[1..\lambda]$ é uma sub-cadeia de caracteres de $p$ que vai do 1º até o $\lambda$-ésimo caractere, e que $p[1..\lambda] = p$ se $|p| \leq \lambda$, nós processamos a subcadeia $p[1..\lambda]$ na linha $3$ com o algoritmo ICPAN caractere a caractere, de acordo com os passos do algoritmo descritos na seção~\ref{sec:second_level}. Após terminar essa etapa obtemos um conjunto $\Psi_{p[1..\lambda]} = \{ \langle n, \xi_{n}^{p[1..\lambda]}, p_{i}, \xi_{n}^{p_{i}} \rangle \}$ de \textit{nós pivô ativos de} $p[1..\lambda]$. Se $|p| \leq \lambda$ consideramos que $p$ é uma consulta ``comum'', e então realizamos o processamento caractere a caractere padrão do ICPAN para obter a resposta na linha $5$. No entanto, quando $|p| > \lambda$, é necessário dividir o processamento em dois níveis.
 
 Com a implementação do conjunto de nós folha virtuais ativos estabelecida é possível seguir para a computação do conjunto de nós ativos do primeiro nível, os quais serão utilizados como filtro para o segundo nível, como descrito na seção~\ref{sec:general_two_level_algorithm}. Ao fim desse processo os conjuntos $\Psi_{p[1..\lambda]}$ e $\psi$ terão sido computados (para os $\lambda$ primeiros caracteres de um prefixo de consulta $p$), e a união $\Psi_{p_[1..\lambda]} \cup \psi$ determina o ``conjunto final'' $\mc{F}$ que será de fato utilizado no segundo nível. 
 
@@ -193,7 +193,7 @@ O Algoritmo~\ref{alg:compute_first_level_nodes} descreve esse procedimento, e te
 %     \If{$|p| < \lambda$}
 %         \State \textbf{return} $recuperarResultadosICPAN(\Psi_{p[1..\lambda]})$
 %     \EndIf
-%     \For{$\langle n, \xi_{n}^{p[1..\lambda]}, m_{i}, \xi_{n}^{p_{i}} \rangle \in \Psi_{p[1..\lambda]} $}
+%     \For{$\langle n, \xi_{n}^{p[1..\lambda]}, p_{i}, \xi_{n}^{p_{i}} \rangle \in \Psi_{p[1..\lambda]} $}
 %         \If{$\xi_{n}^{p[1..\lambda]} < \tau$}
 %             \For{$n_{folha} \in n.L$}
 %                 \For{$itemId \in n_{folha}.R$}
@@ -210,7 +210,7 @@ O Algoritmo~\ref{alg:compute_first_level_nodes} descreve esse procedimento, e te
 %             \EndFor
 %         \Else
 %             \For{$n_{folha} \in n.L$}
-%                 \State $p' \gets p[\lambda+1+ (n.altura - |m_{i}|)..|p|]$
+%                 \State $p' \gets p[\lambda+1+ (n.altura - |p_{i}|)..|p|]$
 %                 \State $limInferior \gets buscaBinariaLimInf(p', n_{folha}.R, n.altura)$
 %                 \State $limSuperior \gets buscaBinariaLimSup(p', n_{folha}.R, n.altura)$
                 
@@ -252,7 +252,7 @@ Dessa forma, é possível eliminar essa redundância ao computar a $|n|$-ésima 
     \EndIf
     \State $sugestoes \leftarrow \emptyset$
     \State $\mc{F} \leftarrow computarNosAtivos(\mc{T}, Prefixo_{\lambda}(p), \tau)$ \Comment{Primeiro Nível}
-    \For{$\langle n, \xi_{n}^{p[1..\lambda]}, m_{i}, \xi_{n}^{p_{i}} \rangle \in \mc{F}$} \Comment{Segundo Nível (até a linha 13)}
+    \For{$\langle n, \xi_{n}^{p[1..\lambda]}, p_{i}, \xi_{n}^{p_{i}} \rangle \in \mc{F}$} \Comment{Segundo Nível (até a linha 13)}
         \State $ultimaLinhaComum \leftarrow ultimaLinhaLevenhstein(n, p)$
         \For{$n_{folha} \in n.L$}
             \For{$id \in n_{folha}.R$}
@@ -318,7 +318,7 @@ No entanto, a subcadeia pesquisada $p[(\delta_{n} + 1)..]$ pode ocorrer em vári
     \EndIf
     \State $sugestoes \leftarrow \emptyset$
     \State $\mc{F} \leftarrow computarNosAtivos(\mc{T}, Prefixo_{\lambda}(p), \tau)$ \Comment{Primeiro Nível}
-    \For{$\langle n, \xi_{n}^{p[1..\lambda]}, m_{i}, \xi_{n}^{p_{i}}, \delta_{n} \rangle \in \mc{F}$} \Comment{Segundo Nível (até a linha 24)}    
+    \For{$\langle n, \xi_{n}^{p[1..\lambda]}, p_{i}, \xi_{n}^{p_{i}}, \delta_{n} \rangle \in \mc{F}$} \Comment{Segundo Nível (até a linha 24)}    
         \If{$\xi_{n}^{p[1..\lambda]} = \tau$} \Comment{Caso em que $n$ é um nó ativo de borda}
             \For{$n_{folha} \in n.L$}
                 \State $p' \gets p[(\delta_{n} + 1)..]$
@@ -375,6 +375,6 @@ A Figura~\ref{fig:binary_search_counterproof} demonstra um contra-exemplo que pr
 
 No entanto, quando o algoritmo IP2LB realiza as buscas binárias no nó ativo de borda $n$ desse exemplo, $s$ não será incluída no conjunto de respostas para a consulta $p$, pois $p[(\delta_{n}+1)..]$, que apesar de ser uma subcadeia de $s'$, não é encontrado nos primeiros caracteres de $s'$, como estabelecido na seção~\ref{sec:IP2LB}. Se não houvesse o caractere ``u'' (destacado em vermelho) em $s$, ou seja, se $s$ fosse $``dedctio"$, o algoritmo IP2LB consideraria $s$ como uma das sugestões válidas como resposta para a consulta. Essa falha também ocorre com outras sugestões no segundo nível do IP2LB, que por consequência não retorna alguns resultados que deveria.
 
-Sendo assim, percebemos que não é possível aplicar a busca binária em todos os nós ativos cuja distância de edição é igual ao limiar $\tau$ sem que haja perda de resultados. Diante disso, na tentativa de resolver esse problema formulamos a hipótese de que é possível melhorar a acurácia do IP2LB restringindo a realização da busca binária para apenas alguns nós ativos de borda. Sendo $\langle n_{b}, \xi_{n_{b}}^{p[1..\lambda]}, m_{i}, \xi_{n_{b}}^{p_{i}}, \delta_{n_{b}} \rangle$ a 5-upla de um nó ativo de borda $n_b$, realizamos a busca binária nesse nó somente se $\delta_{n_{b}} = \lambda$, ou em outras palavras, se o caractere de $p[1..\lambda]$ que estava sendo processado quando $n_{b}$ foi ativado foi o $\lambda$-ésimo caractere. Essa é uma proposta de adaptação necessária para a utilização da ideia de combinar busca binária e sequencial no segundo nível, sendo uma possível resposta para a questão de pesquisa ii), apresentada na seção~\ref{sec:research-problem}. Denominamos esse método como ``IP2LRB'' (\textbf{I}C\textbf{P}AN \textbf{2}-\textit{\textbf{L}evel with \textbf{R}estricted \textbf{B}inary Search}). O algoritmo para o IP2LRB é idêntico ao Algoritmo~\ref{alg:ip2lb}, com apenas uma modificação da condição verificada na linha 6 para esta: ``$\xi_{n}^{p[1..\lambda]} = \tau \land \delta_{n} = \lambda$''.
+Sendo assim, percebemos que não é possível aplicar a busca binária em todos os nós ativos cuja distância de edição é igual ao limiar $\tau$ sem que haja perda de resultados. Diante disso, na tentativa de resolver esse problema formulamos a hipótese de que é possível melhorar a acurácia do IP2LB restringindo a realização da busca binária para apenas alguns nós ativos de borda. Sendo $\langle n_{b}, \xi_{n_{b}}^{p[1..\lambda]}, p_{i}, \xi_{n_{b}}^{p_{i}}, \delta_{n_{b}} \rangle$ a 5-upla de um nó ativo de borda $n_b$, realizamos a busca binária nesse nó somente se $\delta_{n_{b}} = \lambda$, ou em outras palavras, se o caractere de $p[1..\lambda]$ que estava sendo processado quando $n_{b}$ foi ativado foi o $\lambda$-ésimo caractere. Essa é uma proposta de adaptação necessária para a utilização da ideia de combinar busca binária e sequencial no segundo nível, sendo uma possível resposta para a questão de pesquisa ii), apresentada na seção~\ref{sec:research-problem}. Denominamos esse método como ``IP2LRB'' (\textbf{I}C\textbf{P}AN \textbf{2}-\textit{\textbf{L}evel with \textbf{R}estricted \textbf{B}inary Search}). O algoritmo para o IP2LRB é idêntico ao Algoritmo~\ref{alg:ip2lb}, com apenas uma modificação da condição verificada na linha 6 para esta: ``$\xi_{n}^{p[1..\lambda]} = \tau \land \delta_{n} = \lambda$''.
 
 Essa restrição faz com que a busca binária passe a ser realizada em somente $15\% \sim 40\%$ do total de nós ativos de $\Psi_{p[1..\lambda]}$, em contraste aos $75\% \sim 95\%$ do método IP2LB. O efeito disso é que o tempo de processamento de consultas do IP2LRB aproxima-se do tempo do método IP2L, porém trazendo um pouco mais de resultados que antes estavam faltando com o IP2LB. No entanto, mesmo com essa restrição o IP2LRB não consegue ter acurácia absoluta, pois ainda não traz $100\%$ dos resultados que deveria. Com isso, pensando na questão de pesquisa i) concluímos que não é possível adaptar sistemas de busca em dois níveis para tirarem proveito da busca binária no segundo nível sem que haja algum impacto na acurácia do método.
