@@ -194,7 +194,7 @@ Uma possível estratégia de busca em dois níveis para o problema de CATE consi
 \section{Busca binária com elementos repetidos na coleção}
 \label{sec:binary_search_with_duplicates}
 
-Considerando a abordagem em dois níveis, neste trabalho analisamos a hipótese de que é possível utilizar não somente busca sequencial no segundo nível, mas também busca binária em alguns casos especiais, que são nós ativos com uma determinada característica explicada com mais detalhes na sessão~\ref{sec:metodo}. Nesses casos, é necessário realizar buscas binárias nas listas invertidas dos nós folha descendentes dos nós ativos.
+Considerando a abordagem em dois níveis, neste trabalho analisamos a hipótese de que é possível utilizar não somente busca sequencial no segundo nível, mas também busca binária em alguns casos especiais, que são nós ativos com uma determinada característica explicada com mais detalhes no capítulo~\ref{sec:metodo}. Nesses casos, é necessário realizar buscas binárias nas listas invertidas dos nós folha descendentes dos nós ativos.
 
 O melhor algoritmo para busca em vetores ordenados é o de busca binária. Esse método requer que a coleção em que se fará a busca esteja ordenada. A busca binária padrão compara o valor buscado com o valor do elemento presente exatamente no meio da coleção. Se eles não forem iguais, a metade da coleção na qual o valor buscado não pode ser encontrado é desconsiderada, e a busca continua na metade restante, considerando novamente o valor do elemento do meio. Esse processo se repete até que o valor seja encontrado. Se a busca terminar e a metade restante estiver vazia, a busca não encontrou o valor. A complexidade da busca binária é $O(\log n)$, enquanto a da busca sequencial é $O(n)$.
 

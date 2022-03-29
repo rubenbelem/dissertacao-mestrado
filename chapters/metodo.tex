@@ -1,7 +1,7 @@
 \chapter{Método proposto} 
 \label{sec:metodo}
 
-Nesta seção estudaremos uma abordagem em dois níveis para a complementação automática de consulta tolerante a erros que usa o algoritmo \textit{ICPAN} no primeiro nível, e usa tanto pesquisa sequencial quanto binária no segundo nível. O primeiro nível serve como um filtro que seleciona candidatos à resposta para serem processados no segundo nível, responsável por determinar quais candidatos são qualificados como resposta final.
+Neste capítulo estudaremos uma abordagem em dois níveis para a complementação automática de consulta tolerante a erros que usa o algoritmo \textit{ICPAN} no primeiro nível, e usa tanto pesquisa sequencial quanto binária no segundo nível. O primeiro nível serve como um filtro que seleciona candidatos à resposta para serem processados no segundo nível, responsável por determinar quais candidatos são qualificados como resposta final.
 
 O intuito dessa abordagem é reduzir o uso de memória e ao mesmo tempo manter o desempenho quanto ao tempo de processamento da consulta. Os sistemas de busca podem se beneficiar dessa redução pois ela possibilita diminuir os custos com memória mantendo o mesmo conjunto de dados, ou então pode permitir o aumento do conjunto de dados sem que haja um grande impacto na quantidade de memória usada pelo método.
 
@@ -106,7 +106,7 @@ A linha 5 caracteriza o início do processamento do segundo nível. Nela há um 
 \section{Primeiro nível}
 \label{sec:first-level}
 
-O algoritmo de busca utilizado no primeiro nível será o ICPAN, proposto por Li et al \citep{li2011efficient}. Como descrito na seção~\ref{sec:ref_teorico} o ICPAN utiliza um algoritmo incremental que calcula os prefixos semelhantes a um prefixo consultado, tolerando uma quantidade de erros de digitação previamente definida como o limite de distancia de edição $\tau$. Uma característica desse algoritmo é a ``ativação'' de nós da \textit{Trie} que correspondem a um prefixo que pode ser obtido considerando erros no prefixo consultado.
+O algoritmo de busca utilizado no primeiro nível será o ICPAN, proposto por Li et al \citep{li2011efficient}. Como descrito no capítulo~\ref{sec:ref_teorico} o ICPAN utiliza um algoritmo incremental que calcula os prefixos semelhantes a um prefixo consultado, tolerando uma quantidade de erros de digitação previamente definida como o limite de distancia de edição $\tau$. Uma característica desse algoritmo é a ``ativação'' de nós da \textit{Trie} que correspondem a um prefixo que pode ser obtido considerando erros no prefixo consultado.
 
 Ao considerar a utilização do ICPAN no primeiro nível, é preciso atentar para dois pontos: (1) uma vez que o primeiro nível serve apenas como filtro para o processamento do segundo nível, o algoritmo computará nós (pivô) ativos referentes a prefixos semelhantes a uma parte $p[1..\lambda]$ de um prefixo de consulta $p$, e não semelhantes a $p$ por completo. Esse conjunto será referido como $\Psi_{p[1..\lambda]}$ daqui em diante; (2) uma premissa da concepção original desse algoritmo é que todo o texto da sugestão de consulta estará indexado na \textit{Trie}, o que não acontece na abordagem em dois níveis.
 
