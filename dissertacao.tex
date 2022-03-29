@@ -152,7 +152,7 @@
 \tipotrabalho{Dissertação (Mestrado)}
 % O preambulo deve conter o tipo do trabalho, o objetivo, 
 % o nome da instituição e a área de concentração 
-\preambulo{Dissertação apresentada ao Programa de Pós-Graduação em Informática da Universidade Federal do Amazonas como requisito para obtenção do grau de Mestre em Informática.}
+\preambulo{Dissertação apresentada ao Programa de Pós-Graduação em Informática da Universidade Federal do Amazonas como parte dos requisitos necessários para a obtenção do grau de Mestre em Informática.}
 % ---
 
 
@@ -426,9 +426,9 @@ Ao meu saudoso amigo Caio Pinheiro, que tinha planos de entrar novamente para o 
 \begin{resumo}
 A forma tradicional de acesso aos dados com consultas por palavras-chave se dá por meio da utilização de texto completo, mas esse paradigma exige que o usuário possua uma noção sobre a estrutura do conteúdo da base de dados. Para reduzir o esforço necessário para a realização de consultas os motores de busca recentemente têm amplamente adotado a complementação automática de consultas. Além disso, também têm tolerado erros de digitação já que os usuários podem cometê-los. As soluções mais eficientes dos últimos anos são baseadas em índices de árvore \textit{Trie}. No entanto, esse tipo de solução pode acabar consumindo uma grande quantidade de memória, que é um recurso caro e limitado.
 
-Este trabalho apresenta uma estrutura em dois níveis que utiliza o algoritmo ICPAN de busca tolerante a erros em um índices de árvore \textit{Trie} no primeiro nível, e uma combinação de buscas sequencial e binária no segundo. A hipótese inicial era a de que é possível realizar busca binária em vez de sequencial quando todos os erros de digitação tolerados já estiverem sido ``esgotados'' no primeiro nível. No entanto, concluímos no decorrer desta pesquisa que utilizar busca binária no segundo nível impede o método de recuperar algumas sugestões de consulta que deveria, e também o faz trazer outras que ultrapassam a quantidade $\tau$ de erros de digitação tolerados. Diante desse problema, também propusemos uma heurística de ativação seletiva da busca binária. 
+Este trabalho apresenta uma estrutura em dois níveis que utiliza o algoritmo ICPAN de busca tolerante a erros em um índice de árvore \textit{Trie} no primeiro nível, e uma combinação de buscas sequencial e binária no segundo. A hipótese inicial era a de que é possível realizar busca binária em vez de sequencial quando todos os erros de digitação tolerados já estiverem sido ``esgotados'' no primeiro nível. No entanto, concluímos no decorrer desta pesquisa que utilizar busca binária no segundo nível impede o método de recuperar algumas sugestões de consulta que deveria, e também o faz trazer outras que ultrapassam a quantidade $\tau$ de erros de digitação tolerados. Diante desse problema, também propusemos uma heurística de ativação seletiva da busca binária. 
 
-Experimentamos três versões da estrutura em dois níveis, cada uma com determinada modificação no segundo nível e comparamos seus níveis de acurácia, suas performances, e utilização de memória. Ambas as versões que utilizam busca binária com e sem heurística demonstram-se imprecisas para $\tau \leq 2$, porém com uma boa precisão para $\tau=3$. Nesse caso em específico o modelo que utiliza busca binária sem heurística obteve a melhor performance em comparação às outras versões, e também desempenhou melhor que outros métodos encontrados na literatura em alguns casos. Além disso, todos os três modelos propostos demonstraram redução significativa da quantidade de memória necessária para realizar a complementação automática de consultas.
+Experimentamos três versões da estrutura em dois níveis, cada uma com determinada modificação no segundo nível e comparamos seus níveis de acurácia, seus desempenhos, e utilização de memória. Ambas as versões que utilizam busca binária com e sem heurística demonstram-se imprecisas para $\tau \leq 2$, porém com uma boa precisão para $\tau=3$. Nesse caso em específico o modelo que utiliza busca binária sem heurística obteve o melhor desempenho em comparação às outras versões, e também desempenhou melhor que outros métodos encontrados na literatura em alguns casos. Além disso, todos os três modelos propostos demonstraram redução significativa da quantidade de memória necessária para realizar a complementação automática de consultas.
 
 \vspace{\onelineskip}
 \noindent
@@ -442,11 +442,11 @@ Experimentamos três versões da estrutura em dois níveis, cada uma com determi
 \begin{resumo}[Abstract]
  \begin{otherlanguage*}{english}
 
-The traditional way of accessing data through keyword searching is to type the entire query text. However, this paradigm requires that the user knows about the dataset structure. Recently search engines have widely adopted query autocompletion to reduce the effort needed for the user to search. Besides that, they also have been tolerating typing errors, given that users may commit them. The most efficient solutions in the past years are those based on Trie index. However, this kind of solution may lead to more memory usage, which is a costly and limited resource.
+The traditional way of accessing data through keyword searching is to type the entire query text. However, this paradigm requires that the user has knowledge about the dataset structure. Recently search engines have widely adopted query autocompletion to reduce the effort needed for the user to search. Besides that, they also have been tolerating typing errors, given that users may commit them. The most efficient solutions in the past years are those based on Trie index. However, this kind of solution may lead to more memory usage, which is a costly and limited resource.
 
-In this work, we introduce a two-level structure that uses the ICPAN error-tolerant search algorithm at the first level and a combination of sequential and binary search at the second level. The initial hypothesis was that it was possible to perform a binary search instead of a sequential when all the typing errors had already ``ran out'' at the first level. Nonetheless, we conclude in our research that using the binary search at the second level prevents the method of retrieving some query suggestions, and also makes it retrieve some suggestions that exceed the limit $\tau$ of typing errors tolerated. Facing this problem, we also proposed a heuristic to selectively activate the binary search.
+In this work, we introduce a two-level structure that uses the ICPAN error-tolerant search algorithm at the first level and a combination of sequential and binary search at the second level. Our initial hypothesis was that it was possible to perform a binary search instead of a sequential when all the typing errors had already ``ran out'' at the first level. Nonetheless, we conclude in our research that using binary search at the second level prevents the method of retrieving some query suggestions, and also makes it retrieve some suggestions that exceed the limit $\tau$ of typing errors tolerated. Facing this problem, we also proposed a heuristic to selectively activate the binary search.
 
-We have experimented with three versions of the two-level structure, with each one having a modification at the second level. We compared their accuracy levels, their performances, and their memory usage. Both versions that use the binary search with and without the heuristic proved inaccurate for $\tau \leq 2$. However, they had good precision for $\tau=3$. In this specific case, the model that uses binary search without the heuristic had the best performance when compared with the other versions, and also had performed better than other methods found in the literature in some scenarios. Besides that, all the three proposed models have shown a significant reduction in the memory needed to run the error-tolerant query autocompletion.
+We have experimented with three versions of two-level structure, with each one having a modification at the second level. We compared their accuracy levels, their performances, and their memory usage. Both versions that use the binary search with and without the heuristic showed some lack of accuracy for $\tau \leq 2$. However, they had good accuracy for $\tau=3$. In this specific case the model that uses binary search without the heuristic had the best performance when compared with other versions, and also had performed better than other methods found in the literature in some scenarios. Besides that, all the three proposed models have shown a significant reduction of memory needed to run error-tolerant query autocompletion.
 
 
   \vspace{\onelineskip}
@@ -583,6 +583,7 @@ We have experimented with three versions of the two-level structure, with each o
 % Resultados
 % ---------------------
 \input{chapters/resultados}
+\afterpage{\blankpage}
 % ---------------------
 % Conclusão
 % ---------------------
@@ -593,7 +594,7 @@ We have experimented with three versions of the two-level structure, with each o
 % % ----------------------------------------------------------
 % % ELEMENTOS PÓS-TEXTUAIS
 % % ----------------------------------------------------------
-% \postextual
+\postextual
 
 
 % % ----------------------------------------------------------
