@@ -1,7 +1,7 @@
 \chapter{Método proposto} 
 \label{sec:metodo}
 
-Nesta seção estudaremos uma estrutura em dois níveis para a complementação automática de consulta tolerante a erros que usa o algoritmo \textit{ICPAN} no primeiro nível, e usa tanto pesquisa sequencial quanto binária no segundo nível. O primeiro nível serve como um filtro que seleciona candidatos à resposta para serem processados no segundo nível, responsável por determinar quais candidatos são qualificados como resposta final.
+Nesta seção estudaremos uma abordagem em dois níveis para a complementação automática de consulta tolerante a erros que usa o algoritmo \textit{ICPAN} no primeiro nível, e usa tanto pesquisa sequencial quanto binária no segundo nível. O primeiro nível serve como um filtro que seleciona candidatos à resposta para serem processados no segundo nível, responsável por determinar quais candidatos são qualificados como resposta final.
 
 O intuito dessa abordagem é reduzir o uso de memória e ao mesmo tempo manter o desempenho quanto ao tempo de processamento da consulta. Os sistemas de busca podem se beneficiar dessa redução pois ela possibilita diminuir os custos com memória mantendo o mesmo conjunto de dados, ou então pode permitir o aumento do conjunto de dados sem que haja um grande impacto na quantidade de memória usada pelo método.
 
@@ -293,7 +293,7 @@ A função $similar$ retorna $Verdadeiro$ caso $ed(sugestao, p) \leq \tau$, e $F
 
 Uma desvantagem do método IP2L supramencionado é que o segundo nível pode acabar tendo uma execução lenta devido à grande quantidade de buscas sequenciais que precisam ser realizadas. Na tentativa de efetuar uma melhoria do tempo de execução, formulamos a hipótese de que é possível realizar buscas binárias em determinados nós ativos em vez da busca sequencial, combinando os dois tipos de busca no segundo nível. O pressuposto para realizar a busca binária é o de que ela pode ser aplicada em casos onde todos os erros de digitação possíveis já foram ``esgotados'' na computação do primeiro nível para a subcadeia $p[1..\lambda]$. Quando isso acontece, espera-se que seja possível realizar comparações simples entre cadeias de caracteres no segundo nível sem a necessidade de calcular matrizes de \textit{Levenhstein}.
 
-Considerando a estrutura de dois níveis proposta neste trabalho, é possível categorizar dois tipos de nós ativos que se encontram no conjunto $\mc{F}$:
+Considerando o método de dois níveis proposto neste trabalho, é possível categorizar dois tipos de nós ativos que se encontram no conjunto $\mc{F}$:
 
 \begin{itemize}
     \item \textit{Nó ativo comum} -- são os nós do subconjunto $\{n_{c} \in \mc{F} \mid \xi_{n_{c}}^{p[1..\lambda]} < \tau \}$. Quando a distância de edição entre o nó ativo e $p[1..\lambda]$ é menor do que $\tau$, ainda há erros de digitação restantes para serem verificados no segundo nível. Portanto, para as folhas com raiz nesse nó é necessário realizar a busca sequencial tolerante a erros.
