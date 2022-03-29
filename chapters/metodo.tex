@@ -71,7 +71,7 @@ O Algoritmo~\ref{alg:dataset_indexing} descreve a construção de um índice \te
 
 O Algoritmo~\ref{alg:append_prefix_trie} descreve a inserção de um prefixo de sugestão de consulta (o qual pode na verdade ser a consulta inteira). Esse algoritmo tem como parâmetro: $\mc{T}, prefixo, id$, os quais representam a árvore \textit{Trie}, o prefixo de sugestão de consulta, e a identificação numérica da consulta, respectivamente. Na linha 4, atualiza-se o valor $maior$ do intervalo $raiz.R = [menor, maior]$ para ser igual ao $id$ da sugestão de consulta que está sendo inserida. Então, cada caractere do $prefixo$ (linha 5) é inserido na \textit{Trie} um a um na (linha 6). A cada inserção, o nó $n$ é atualizado com último nó que foi inserido ou apenas percorrido (caso todo o caminho já exista na árvore). Após essas inserções, na linha 8 o nó $n$ é marcado como folha. Por fim, o $id$ da sugestão de consulta é inserido na lista $L$ do nó $n$ na linha 9 e a função retorna $n$ na linha 10. 
 
-\section{Algoritmo Geral da Abordagem em Dois Níveis}
+\section{Algoritmo geral da abordagem em dois níveis}
 \label{sec:general_two_level_algorithm}
 % Esta premissa descrita a seguir não é 100% correta. Percebi no dia 26-05-2021 enquanto escrevia aqui que, com a implementação do conjunto de folhas virtuais, é possível computar nós ativos para os lambda+tau primeiros caracteres de p, ou para p inteiro caso |p| <= lambda + tau. Creio que vale a pena explorar essa premissa melhorada para a publicação do artigo.
 Como descrito na seção~\ref{sec:indexing}, somente os $\lambda$ primeiros caracteres de cada sugestão de consulta da base são indexados na \textit{Trie}. Então, devido a esse fato, temos a premissa de que somente os $\lambda$ primeiros caracteres de um prefixo de consulta $p$ devem ser considerados na computação do conjunto de nós ativos. Com tal conjunto computado, cada nó é visitado, e recupera-se sua lista de nós folha. Para cada uma das listas invertidas desses nós folha, é possível realizar a busca sequencial apresentada na seção~\ref{sec:sequential_search}. 
@@ -112,7 +112,7 @@ Ao considerar a utilização do ICPAN no primeiro nível, é preciso atentar par
 
 Dessa maneira, o propósito original de utilização dos nós ativos foi modificado. Alguns nós importantes para o processamento no segundo nível acabam sendo desativados durante o processamento incremental do ICPAN, e deixam de estar presentes em $\Psi_{p[1..\lambda]}$. A partir dessa situação observamos em nossa pesquisa que o conteúdo do conjunto $\Psi{p[1..\lambda]}$ resultante da computação original do ICPAN \textit{não é suficiente para resolver completamente o problema de CATE na abordagem em dois níveis}. 
 
-\subsection{Conjunto de Nós Folha Virtuais Ativos}
+\subsection{Conjunto de nós folha virtuais ativos}
 \label{sec:virtual_leaves_node-set}
 
 Devido ao problema de nós desativados mencionado acima, faz-se necessário um mecanismo que preserve esses nós ativos importantes para que eles também estejam no conjunto final de nós ativos de $p[1..\lambda]$. O mecanismo proposto neste trabalho para resolver esse problema consiste em computar, simultaneamente ao conjunto de nós ativos $\Psi$ do ICPAN, um conjunto $\psi$ de ``nós folha virtuais ativos'' auxiliar que manterá esses nós importantes que acabariam sendo desativados durante o processamento incremental dos nós ativos. 
@@ -151,7 +151,7 @@ Na linha 4 define-se o laço de repetição de iteração sobre todas as tuplas 
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Computação de Nós Ativos no Primeiro Nível}
+\subsection{Computação de nós ativos no primeiro nível}
 \label{sec:first_level_active_node_set_computation}
 
 % Seja $p$ um prefixo consultado pelo usuário. Considerando que $p[1..\lambda]$ é uma sub-cadeia de caracteres de $p$ que vai do 1º até o $\lambda$-ésimo caractere, e que $p[1..\lambda] = p$ se $|p| \leq \lambda$, nós processamos a subcadeia $p[1..\lambda]$ na linha $3$ com o algoritmo ICPAN caractere a caractere, de acordo com os passos do algoritmo descritos na seção~\ref{sec:second_level}. Após terminar essa etapa obtemos um conjunto $\Psi_{p[1..\lambda]} = \{ \langle n, \xi_{n}^{p[1..\lambda]}, p_{i}, \xi_{n}^{p_{i}} \rangle \}$ de \textit{nós pivô ativos de} $p[1..\lambda]$. Se $|p| \leq \lambda$ consideramos que $p$ é uma consulta ``comum'', e então realizamos o processamento caractere a caractere padrão do ICPAN para obter a resposta na linha $5$. No entanto, quando $|p| > \lambda$, é necessário dividir o processamento em dois níveis.
@@ -235,7 +235,7 @@ O Algoritmo~\ref{alg:compute_first_level_nodes} descreve esse procedimento, e te
 
 Quando o conjunto final de nós ativos $\mc{F} = \Psi_{p[1..\lambda]} \cup \psi$ é computado para $p[1..\lambda]$ no primeiro nível, é preciso iniciar a etapa do segundo nível. Como dito anteriormente, cada nó $n$ pertencente a esse conjunto possui uma lista $L$ de nós folha, da qual cada nó $n_{folha}$ tem um intervalo $R$ que contém o menor e maior $id$ das sugestões de consulta que começam com o prefixo formado ao percorrer o caminho da raiz até $n_{folha}$. A etapa do segundo nível consiste em, para todas as sugestões de consulta referenciadas por todos esses nós folha, determinar quais delas possuem um prefixo similar à $p$ com no máximo $\tau$ erros de edição. 
 
-\section{Utilizando somente Busca Sequencial} 
+\section{Utilizando somente busca sequencial} 
 \label{sec:IP2L}
 
 Para atingir esse objetivo, uma forma é realizar uma busca sequencial dentre essas sugestões de acordo com o algoritmo descrito na seção~\ref{sec:sequential_search}. Seja $n$ um dos nós presentes no conjunto $\mc{F}$, $n_{folha}$ um dos nós folha presentes em $n.L$. O intervalo $n_{folha}.R = [minimo, maximo]$ representa uma lista de $ids$ do dicionário $\mc{H}$ de sugestões indexadas. Ao aplicar nessa lista o algoritmo de busca sequencial descrito na seção~\ref{sec:sequential_search}, determinaremos quais das sugestões que começam com o prefixo $n_{folha}$ são similares ao prefixo de consulta $p$ considerando $\tau$ erros de digitação. Essa busca sequencial é realizada em todos os outros nós folhas de $n$. Além disso, esse procedimento que é realizado para $n$ também é executado para todos os outros nós em $\mc{F}$. Desse modo, obtém-se todos as sugestões de consulta similares à $p$, a resposta do problema de CATE.
@@ -288,7 +288,7 @@ A função $similar$ retorna $Verdadeiro$ caso $ed(sugestao, p) \leq \tau$, e $F
 %  Freases-chave: adaptar a busca em dois níveis IP2L para utilizar busca binária no segundo nível; descrever as adaptações necessárias, no caso, a diferenciação entre nós comuns e "nós de borda".
 % ***************************************
 
-\section{Combinando Busca Sequencial com Binária}
+\section{Combinando busca sequencial com binária}
 \label{sec:IP2LB}
 
 Uma desvantagem do método IP2L supramencionado é que o segundo nível pode acabar tendo uma execução lenta devido à grande quantidade de buscas sequenciais que precisam ser realizadas. Na tentativa de efetuar uma melhoria do tempo de execução, formulamos a hipótese de que é possível realizar buscas binárias em determinados nós ativos em vez da busca sequencial, combinando os dois tipos de busca no segundo nível. O pressuposto para realizar a busca binária é o de que ela pode ser aplicada em casos onde todos os erros de digitação possíveis já foram ``esgotados'' na computação do primeiro nível para a subcadeia $p[1..\lambda]$. Quando isso acontece, espera-se que seja possível realizar comparações simples entre cadeias de caracteres no segundo nível sem a necessidade de calcular matrizes de \textit{Levenhstein}.
