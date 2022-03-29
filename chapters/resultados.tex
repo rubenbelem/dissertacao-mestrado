@@ -1,7 +1,7 @@
 \chapter{Resultados}
 \label{sec:results}
 
-Nesse capítulo nós apresentamos os resultados do estudo de parâmetros dos métodos propostos, suas vantagens e desvantagens e também os cenários onde podem ser melhor aplicados. Além disso, também comparamos os métodos propostos com alguns \textit{baselines} (métodos de linha de base). A partir dos experimentos espera-se responder as seguintes perguntas: i) É possível adaptar sistemas de busca em dois níveis para tirarem proveito da busca binária no segundo nível? ii) Quais são as adaptações necessárias e limitações de uso da ideia? iii) Há vantagens práticas na combinação de busca binária e busca sequencial no segundo nível?
+Nesse capítulo nós apresentamos os resultados do estudo de parâmetros dos métodos propostos, suas vantagens e desvantagens e também os cenários onde podem ser melhor aplicados. Além disso, também comparamos os métodos propostos com alguns \textit{baselines} (métodos usados para comparação de resultados experimentais). A partir dos experimentos espera-se responder as seguintes perguntas: i) É possível adaptar sistemas de busca em dois níveis para tirarem proveito da busca binária no segundo nível? ii) Quais são as adaptações necessárias e limitações de uso da ideia? iii) Há vantagens práticas na combinação de busca binária e busca sequencial no segundo nível?
 
 \section{Configuração dos experimentos}
 \label{sec:experiments-setup}
@@ -661,10 +661,10 @@ Para a base JUSBRASIL ocorreu uma peculiaridade nas quantidades de memória: ent
 
 O contexto e cenário de um sistema de CATE podem influenciar a escolha do valor ideal para $\lambda$. Deve-se levar em conta o tamanho médio dos prefixos de consulta que se espera receber no sistema, o número de sugestões na base para se indexar, o tamanho médio dessas sugestões, e a quantidade de memória disponível. 
 
-Por fim, selecionamos os modelos IP2L-10, IP2LRB-10 e IP2LB-10 para serem comparados com os métodos de base na seção~\ref{sec:comparison_baseline_methods} a seguir. Dentre os valores de $\lambda$ e $\tau$ experimentados o valor $\lambda=10$ foi o que mais aproximou o tempo de processamento dos métodos do limite de $100ms$ para bases grandes como USADDR e JUSBRASIL. Além disso, mesmo para $\lambda=10$ a economia de memória em relação ao método ICPAN original chega a ser mais de $50\%$ como será demonstrado na próxima seção.
+Por fim, selecionamos os modelos IP2L-10, IP2LRB-10 e IP2LB-10 para serem comparados com os \textit{baselines} na seção~\ref{sec:comparison_baseline_methods} a seguir. Dentre os valores de $\lambda$ e $\tau$ experimentados o valor $\lambda=10$ foi o que mais aproximou o tempo de processamento dos métodos do limite de $100ms$ para bases grandes como USADDR e JUSBRASIL. Além disso, mesmo para $\lambda=10$ a economia de memória em relação ao método ICPAN original chega a ser mais de $50\%$ como será demonstrado na próxima seção.
 
 
-\section{Comparação com os Métodos de Base}
+\section{Comparação com os \textit{Baselines}}
 \label{sec:comparison_baseline_methods}
 
 Nesta seção iremos comparar os métodos IP2L-10, IP2LB-10 e IP2LRB-10 com os métodos ICAN, ICPAN, e META (cujos códigos foram providos pelos autores) e também o método BEVA (implementação própria) nas bases AOL e USADDR. Analisaremos as médias de tempo de processamento em dois cenários: (1) variando o limiar $\tau$ de distância de edição para um prefixo de consulta mais curto de tamanho 5, e também mais longo, de tamanho 13; (2) média de tempos de processamento para $\tau=3$, variando o tamanho do prefixo de 3 a 13, de 2 em 2. Por fim, analisaremos também a utilização de memoria.
@@ -687,7 +687,7 @@ As Tabelas \ref{tab:baselines-varying-tau-p-5} e \ref{tab:baselines-varying-tau-
 \multicolumn{1}{|c|}{BEVA} & 0,25 & 1,42 & 3,92 & 0,72 & 9,31 & 51,85 \\ \hline
 \multicolumn{1}{|c|}{META} & 0,07 & 1,46 & 25,88 & 0,33 & 52,31 & 4572,78 \\ \hline
 \end{tabular}
-\caption{Tempos de processamento dos algoritmos em dois níveis propostos com $\lambda=10$ e os outros métodos de base, para as bases de sugestões de consulta AOL e USADDR e $|p|=5$, com $\tau$ variando de $1$ a $3$.}
+\caption{Tempos de processamento dos algoritmos em dois níveis propostos com $\lambda=10$ e os outros \textit{baselines}, para as bases de sugestões de consulta AOL e USADDR e $|p|=5$, com $\tau$ variando de $1$ a $3$.}
 \label{tab:baselines-varying-tau-p-5}
 \end{table}
 
@@ -713,13 +713,13 @@ Na base USADDR vemos novamente para $\tau=1$ que os métodos ICAN e META obtiver
 \multicolumn{1}{|c|}{BEVA} & 0,33 & 1,80 & 5,49 & 0,92 & 12,13 & 78,85 \\ \hline
 \multicolumn{1}{|c|}{META} & 0,20 & 2,95 & 38,81 & 0,80 & 74,64 & 6006,38 \\ \hline
 \end{tabular}
-\caption{Tempos de processamento dos algoritmos em dois níveis propostos com $\lambda=10$ e os outros métodos de base, para as bases de sugestões de consulta AOL e USADDR e $|p|=13$, com $\tau$ variando de $1$ a $3$.}
+\caption{Tempos de processamento dos algoritmos em dois níveis propostos com $\lambda=10$ e os outros \textit{baselines}, para as bases de sugestões de consulta AOL e USADDR e $|p|=13$, com $\tau$ variando de $1$ a $3$.}
 \label{tab:baselines-varying-tau-p-13}
 \end{table}
 
 Na Tabela~\ref{tab:baselines-varying-tau-p-13} para a base AOL podemos observar que quando $\tau=1$ há uma diferença sutil entre o tempo do IP2LB-10 e os tempos dos outros dois métodos de dois níveis. Com $|p|=13$ o segundo nível está sendo ativado, então as diferenças de eficiência do segundo nível começam a aparecer. O IP2LB-10 foi o que obteve o menor tempo de processamento. Vale ressaltar no entanto que a acurácia é baixa para $\tau=1$ e relativamente baixa para $\tau=2$, como foi demonstrado na seção~\ref{sec:binary-search-impact-on-two-level}. O tempo do ICPAN foi bem similar aos do IP2L-10 e IP2LRB-10. Para $\tau=2$ pode-se notar que os tempos dos métodos IP2L-10 e IP2LRB-10 foram um pouco menores do que o ICPAN. A diferença entre o tempo do IP2LB-10 e os outros dois métodos de dois níveis já aparenta ser um pouco mais expressiva. Os algoritmos de dois níveis obtiveram os menores tempos de processamento. Para $\tau=3$ o bom desempenho do IP2LB-10 pode ser notado com mais clareza pois atingiu um tempo de 3,74\textit{ms} (menor tempo dentre os algoritmos), sendo aproximadamente 1,5 vezes mais rápido do que o IP2L-10, que obteve um tempo de 5,55\textit{ms}. O IP2L-10 foi o único método em dois níveis que teve um tempo de processamento maior do que o BEVA para $\tau=3$. Além disso, os tempos do IP2L-10 e IP2LRB-10 agora foram maiores do que o ICPAN.
 
-Na base USADDR e $\tau=1$, o método IP2L-10 obteve um tempo quase 2 vezes mais lento do que o ICPAN, no entanto, ainda com um tempo eficiente de menos de 1\textit{ms}. Além disso, todos os métodos de base também obtiveram tempo menor que 1\textit{ms}. O IP2LB-10 obteve o menor tempo para $\tau=1$ e $\tau=2$, no entanto, possui os problemas de acurácia nesses casos mencionados na seção~\ref{sec:binary-search-impact-on-two-level}. Para $\tau=2$, o IP2LRB-10 ficou logo atrás do IP2L-10, obtendo o segundo menor tempo. Também podemos verificar que o desempenho de 8,12\textit{ms} do IP2L-10 se aproximou mais do ICPAN, com 8,07\textit{ms}, ou seja, uma diferença de apenas 0,05\textit{ms}. Para $\tau=3$, em uma base grande como a USADDR a dificuldade do desafio de CATE se torna mais nítida, bem como a eficiência do método BEVA, que foi o único a conseguir um tempo de processamento menor do que 100\textit{ms} sem ter problemas de acurácia, e ainda com uma boa margem em relação aos outros métodos. No entanto, vale destacar que o método IP2LB-10 também obteve tempo menor do que 100\textit{ms}, e como $\tau=3$, sua acurácia é mais passível de se utilizar em um sistema real de CATE. 
+Na base USADDR e $\tau=1$, o método IP2L-10 obteve um tempo quase 2 vezes mais lento do que o ICPAN, no entanto, ainda com um tempo eficiente de menos de 1\textit{ms}. Além disso, todos os \textit{baselines} também obtiveram tempo menor que 1\textit{ms}. O IP2LB-10 obteve o menor tempo para $\tau=1$ e $\tau=2$, no entanto, possui os problemas de acurácia nesses casos mencionados na seção~\ref{sec:binary-search-impact-on-two-level}. Para $\tau=2$, o IP2LRB-10 ficou logo atrás do IP2L-10, obtendo o segundo menor tempo. Também podemos verificar que o desempenho de 8,12\textit{ms} do IP2L-10 se aproximou mais do ICPAN, com 8,07\textit{ms}, ou seja, uma diferença de apenas 0,05\textit{ms}. Para $\tau=3$, em uma base grande como a USADDR a dificuldade do desafio de CATE se torna mais nítida, bem como a eficiência do método BEVA, que foi o único a conseguir um tempo de processamento menor do que 100\textit{ms} sem ter problemas de acurácia, e ainda com uma boa margem em relação aos outros métodos. No entanto, vale destacar que o método IP2LB-10 também obteve tempo menor do que 100\textit{ms}, e como $\tau=3$, sua acurácia é mais passível de se utilizar em um sistema real de CATE. 
 
 Outra situação ocorrida é que o IP2L-10 obteve 117,05\textit{ms} um tempo de processamento menor do que o ICPAN, com 130,38\textit{ms}. E preciso considerar que o IP2L-10 realiza uma busca tolerante a erros no primeiro nível em uma árvore de altura profundidade máxima igual a 10, e então buscar sequencialmente no segundo nível por $p$. Além disso, para valores maiores de $\lambda$, frequentemente o tamanho das listas em que se realiza a busca sequencial e menor quando o segundo nível é ativado. Uma vez que $|p|=13$ e $\tau=3$, o ICPAN precisa realizar a busca tolerante a erros em uma profundidade máxima de $|p| + \tau = 16$ caracteres para responder ao prefixo de consulta $p$. Diferentemente do que ocorreu na base AOL para $\tau=3$, o experimento indica que possivelmente em uma base grande como o USADDR e com uma tolerância maior a erros como $\tau=3$, o processamento de nós com uma maior profundidade na árvore do ICPAN é mais lento do que combinar o processamento desses nós em uma profundidade menor com busca sequencial.
 
@@ -742,7 +742,7 @@ As Tabelas \ref{tab:baselines-varying-prefix-size-AOL} e \ref{tab:baselines-vary
 \multicolumn{1}{|c|}{BEVA} & 0,004 & 3,92 & 4,90 & 5,22 & 5,45 & 5,49 \\ \hline
 \multicolumn{1}{|c|}{META} & 11,27 & 25,88 & 31,77 & 34,76 & 37,57 & 38,81 \\ \hline
 \end{tabular}
-\caption{Tempos de processamento médios dos métodos propostos com $\lambda=10$ e dos métodos de base para $\tau=3$, na base de sugestões de consultas AOL, variando o tamanho do prefixo de consulta de 3 a 13, de 2 em 2.}
+\caption{Tempos de processamento médios dos métodos propostos com $\lambda=10$ e dos \textit{baselines} para $\tau=3$, na base de sugestões de consultas AOL, variando o tamanho do prefixo de consulta de 3 a 13, de 2 em 2.}
 \label{tab:baselines-varying-prefix-size-AOL}
 \end{table}
 
@@ -762,7 +762,7 @@ Na Tabela~\ref{tab:baselines-varying-prefix-size-AOL} podemos observar que o mé
 \multicolumn{1}{|c|}{BEVA} & 0,01 & 51,85 & 68,33 & 75,49 & 77,23 & 78,85 \\ \hline
 \multicolumn{1}{|c|}{META} & 2400,16 & 4572,78 & 5140,76 & 5656,81 & 5864,68 & 6006,38 \\ \hline
 \end{tabular}
-\caption{Tempos de processamento médios dos métodos propostos com $\lambda=10$ e dos métodos de base para $\tau=3$, na base de sugestões de consultas USADDR, variando o tamanho do prefixo de consulta de 3 a 13, de 2 em 2.}
+\caption{Tempos de processamento médios dos métodos propostos com $\lambda=10$ e dos \textit{baselines} para $\tau=3$, na base de sugestões de consultas USADDR, variando o tamanho do prefixo de consulta de 3 a 13, de 2 em 2.}
 \label{tab:baselines-varying-prefix-size-USADDR}
 \end{table}
 
@@ -772,7 +772,7 @@ Diferentemente da base AOL, a eficiência do método BEVA fica mais clara em uma
 
 \subsection{Consumo de memória}
 
-Quando comparamos o consumo de memória, notamos que os métodos propostos apresentam uma vantagem em comparação aos métodos de base. A Tabela~\ref{tab:baselines-memory-consumption} apresenta a quantidade média de memória utilizada pelos métodos propostos e os de base para os 3 valores de $\tau$ experimentados (cada célula contém a média aritmética entre as quantidades de memória medidas para $\tau=1$, $\tau=2$ e $\tau=3$), nas bases AOL, USADDR e JUSBRASIL. Para todas as bases podemos observar que os métodos propostos obtiveram o menor consumo de memória. 
+Quando comparamos o consumo de memória, notamos que os métodos propostos apresentam uma vantagem em comparação aos \textit{baselines}. A Tabela~\ref{tab:baselines-memory-consumption} apresenta a quantidade média de memória utilizada pelos métodos propostos e os de base para os 3 valores de $\tau$ experimentados (cada célula contém a média aritmética entre as quantidades de memória medidas para $\tau=1$, $\tau=2$ e $\tau=3$), nas bases AOL, USADDR e JUSBRASIL. Para todas as bases podemos observar que os métodos propostos obtiveram o menor consumo de memória. 
 
 \begin{table}[h]
 \centering
@@ -788,7 +788,7 @@ Quando comparamos o consumo de memória, notamos que os métodos propostos apres
 \multicolumn{1}{|c|}{BEVA} & 215,91 & 5962,14 & 19232,93 \\ \hline
 \multicolumn{1}{|c|}{META} & 262,31 & 7481,40 & - \\ \hline
 \end{tabular}
-\caption{Quantidades médias de memória em \textit{MegaBytes} utilizadas pelos métodos de base e métodos IP2L, IP2LB, e IP2LRB durante o processamento das consultas para os 3 valores de $\tau$ experimentados, com o parâmetro $\lambda=10$ para as bases AOL, USADDR, e JUSBRASIL.}
+\caption{Quantidades médias de memória em \textit{MegaBytes} utilizadas pelos \textit{baselines} e métodos IP2L, IP2LB, e IP2LRB durante o processamento das consultas para os 3 valores de $\tau$ experimentados, com o parâmetro $\lambda=10$ para as bases AOL, USADDR, e JUSBRASIL.}
 \label{tab:baselines-memory-consumption}
 \end{table}
 
