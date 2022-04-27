@@ -602,7 +602,7 @@
 
 % ---
 % Ambiente para definicao da Capa
-\newenvironment{capa}{\begin{titlingpage}}{\end{titlingpage}\cleardoublepage}
+\newenvironment{capa}{\begin{titlingpage}}{\end{titlingpage}}
 % ---
 
 % ---
@@ -630,7 +630,7 @@
    \clearpage%
    \PRIVATEbookmarkthis{#1}%
    \begin{Spacing}{1.0}
-}{\end{Spacing}\PRIVATEclearpageifneeded}   
+}{\end{Spacing}}   
 % ---
 
 % ---
@@ -639,14 +639,14 @@
    \ifthenelse{\equal{#1}{}}{%
     \PRIVATEbookmarkthis{\dedicatorianame}
     }{\pretextualchapter{#1}}
-  }{\PRIVATEclearpageifneeded}
+  }
 % ---
 
 % ---
 % Agradecimentos
 \newenvironment{agradecimentos}[1][\agradecimentosname]{%
    \pretextualchapter{#1}
-  }{\PRIVATEclearpageifneeded}
+  }
 % ---
 
 % ---
@@ -655,7 +655,7 @@
    \ifthenelse{\equal{#1}{}}{%
     \PRIVATEbookmarkthis{\epigraphname}
     }{\pretextualchapter{#1}}
-  }{\PRIVATEclearpageifneeded}
+  }
 % ---
 
 % ---
@@ -666,7 +666,7 @@
    \renewcommand{\abstractname}{\ABNTEXchapterupperifneeded{#1}}
    \begin{abstract}
    \SingleSpacing
-  }{\end{abstract}\PRIVATEclearpageifneeded}
+  }{\end{abstract}}
   
 \newenvironment{resumoumacoluna}[1][\resumoname]{%
    \PRIVATEbookmarkthis{#1}
@@ -674,7 +674,7 @@
    \renewcommand{\abstractname}{\ABNTEXchapterupperifneeded{#1}}
    \begin{onecolabstract}
    \SingleSpacing
-}{\end{onecolabstract}\PRIVATEclearpageifneeded}
+}{\end{onecolabstract}}
 % ---
 
 % ---
@@ -860,9 +860,9 @@
 % ---
 % Impressão da Capa
 \newcommand{\imprimircapa}{%
-  \begin{capa}%
+  \begin{capa}
     \center
-    %\vspace*{1cm}
+    % \vspace*{1cm}
     {\ABNTEXchapterfont\large\imprimirautor}
 
     \vspace*{\fill}
@@ -885,8 +885,8 @@
 %   página no caso de estar no modo twoside. Util para imprimir a Ficha
 %   Bibliografica. Porem, se estiver no modo oneside, a versao sem estrela
 %   é identica.
-\newenvironment{folhaderosto}[1][\folhaderostoname]{\clearpage\PRIVATEbookmarkthis{#1}}{\cleardoublepage}
-\newenvironment{folhaderosto*}[1][\folhaderostoname]{\clearpage\PRIVATEbookmarkthis{#1}}{\newpage}%
+\newenvironment{folhaderosto}[1][\folhaderostoname]{\clearpage\PRIVATEbookmarkthis{#1}}{}
+\newenvironment{folhaderosto*}[1][\folhaderostoname]{\clearpage\PRIVATEbookmarkthis{#1}}{}%
 
 % ---
 % Conteudo padrao da Folha de Rosto

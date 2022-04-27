@@ -209,12 +209,14 @@
 % ----------------------------------------------------------
 % ELEMENTOS PRÉ-TEXTUAIS
 % ----------------------------------------------------------
- \pretextual
+\pretextual
 
 % ---
 % Capa
 % ---
+
 \imprimircapa
+
 % ---
 
 % ---
@@ -405,6 +407,7 @@ Ao meu saudoso amigo Caio Pinheiro, que tinha planos de entrar novamente para o 
 % ---
 % Epígrafe
 % ---
+\newpage
 \begin{epigrafe}
     \vspace*{\fill}
 	\begin{flushright}
@@ -416,7 +419,7 @@ Ao meu saudoso amigo Caio Pinheiro, que tinha planos de entrar novamente para o 
 	\end{flushright}
 \end{epigrafe}
 \newpage
-\newpage
+
 % ---
 
 % ---
@@ -434,7 +437,7 @@ A complementação automática de consultas é uma funcionalidade importante par
 
 %  \textbf{Palavras-chaves}: Em desenvolvimento ...
 \end{resumo}
-
+\newpage
 % % % resumo em inglês
 \begin{resumo}[Abstract]
  \begin{otherlanguage*}{english}
@@ -448,7 +451,7 @@ Query autocompletion is an important feature for moderen search engines that sta
   \textbf{Key-words}: Query processing, autocompletion, query autocompletion, error-tolerant, two level, Trie, binary search.
  \end{otherlanguage*}
 \end{resumo}
-
+\newpage
 % resumo em francês 
 % \begin{resumo}[Résumé]
 %  \begin{otherlanguage*}{french}
@@ -473,7 +476,6 @@ Query autocompletion is an important feature for moderen search engines that sta
 %  \end{otherlanguage*}
 % \end{resumo}
 % ---
-\newpage
 % ---
 % inserir lista de ilustrações
 % ---
@@ -500,7 +502,7 @@ Query autocompletion is an important feature for moderen search engines that sta
     Algoritmo \normalfont #1 – }
 \makeatother
 \listofalgorithms
-\cleardoublepage
+\newpage
 
 \makeatletter
 \def\numberline#1{\hb@xt@\@tempdima{#1\hfil}}
@@ -541,7 +543,6 @@ Query autocompletion is an important feature for moderen search engines that sta
 % ---
 \pdfbookmark[0]{\contentsname}{toc}
 \tableofcontents*
-\cleardoublepage
 % ---
 
 
